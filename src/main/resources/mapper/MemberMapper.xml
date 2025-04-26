@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baller.infrastructure.mapper.MemberMapper">
+
+    <insert id="signUp" parameterType="com.baller.domain.model.Member">
+        INSERT INTO member (
+            email,
+            password,
+            name,
+            phone_number
+        ) VALUES (
+             #{email},
+             #{password},
+             #{name},
+             #{phoneNumber}
+         )
+    </insert>
+
+    <select id="existsByEmail" parameterType="String" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM member
+            WHERE email = #{email}
+        )
+    </select>
+
+</mapper>
