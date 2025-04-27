@@ -1,6 +1,8 @@
 package com.baller.common.exception;
 
-public class AlreadyExistsEmailException extends abstractException {
+import org.springframework.http.HttpStatus;
+
+public class AlreadyExistsEmailException extends BaseException {
 
     private static final String MESSAGE = "이미 가입된 이메일입니다.";
 
@@ -9,8 +11,8 @@ public class AlreadyExistsEmailException extends abstractException {
     }
 
     @Override
-    public int getStatusCode(){
-        return 400;
+    public HttpStatus getStatusCode(){
+        return HttpStatus.BAD_REQUEST;
     }
 
 }

@@ -2,6 +2,7 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.MemberService;
 import com.baller.presentation.dto.request.member.SignUpRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member")
+@RequestMapping("/api/members")
 public class MemberController {
 
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<String> signUp(@RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         memberService.signUp(signUpRequest);
-        return ResponseEntity.ok("회원가입 성공");
+        return ResponseEntity.ok().build();
     }
 
 }
