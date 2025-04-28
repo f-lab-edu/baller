@@ -28,7 +28,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("회원가입")
-    void test6() throws Exception {
+    void signUpControllerTest() throws Exception {
         // given
         SignUpRequest signup = SignUpRequest.builder()
                 .email("test@flab.com")
