@@ -1,28 +1,19 @@
 package com.baller.domain.model;
 
+import com.baller.domain.enums.EnumRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class Role {
 
     private Long id;
-
-    private String email;
-
-    private String password;
-
-    private String name;
-
-    private String phoneNumber;
-
-    private List<Role> roles;
+    private Long memberId;
+    private EnumRole role;
 
 }

@@ -17,7 +17,7 @@ public class ExceptionController {
         log.error("[500 ERROR] : ", e);
 
         ErrorResponse body = ErrorResponse.builder()
-                .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.")
                 .build();
 
@@ -30,7 +30,7 @@ public class ExceptionController {
         HttpStatus statusCode = e.getStatusCode();
 
         ErrorResponse body = ErrorResponse.builder()
-                .code(String.valueOf(statusCode))
+                .code(statusCode.value())
                 .message(e.getMessage())
                 .build();
 
