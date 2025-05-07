@@ -2,27 +2,4 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.baller.infrastructure.mapper.MemberMapper">
 
-    <resultMap id="memberWithRolesMap" type="com.baller.domain.model.Member">
-        <id property="id" column="id"/>
-        <result property="email" column="email"/>
-        <result property="password" column="password"/>
-        <result property="name" column="name"/>
-        <result property="phoneNumber" column="phone_number"/>
-
-        <collection property="roles" ofType="com.baller.domain.model.Role">
-            <id property="id" column="role_id"/>
-            <result property="memberId" column="member_id"/>
-            <result property="role" column="role"/>
-        </collection>
-    </resultMap>
-
-    <select id="findByEmail" resultMap="memberWithRolesMap">
-        SELECT
-            m.ID as id, m.EMAIL, m.PASSWORD, m.NAME, m.PHONE_NUMBER as phone_number,
-            r.ID as role_id, r.MEMBER_ID as member_id, r.ROLE
-        FROM MEMBER m
-                 LEFT JOIN MEMBER_ROLE r ON m.ID = r.MEMBER_ID
-        WHERE m.EMAIL = #{email}
-    </select>
-
 </mapper>

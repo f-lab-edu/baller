@@ -51,8 +51,8 @@ public class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("로그인")
-    void loginControllerTest() throws Exception {
+    @DisplayName("로그인 성공")
+    void loginSuccessControllerTest() throws Exception {
         // given
         SignUpRequest signup = SignUpRequest.builder()
                 .email("test@flab.com")
@@ -75,4 +75,31 @@ public class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("로그인 실패")
+    void loginFailControllerTest() throws Exception {
+        // given
+        SignUpRequest signup = SignUpRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .name("테스트")
+                .phoneNumber("010-2222-3333")
+                .build();
+
+        memberService.signUp(signup);
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@12345")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
 }

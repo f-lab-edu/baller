@@ -1,6 +1,6 @@
 package com.baller.domain.enums;
 
-public enum EnumRole {
+public enum RoleType {
     ROLE_MEMBER,
     ROLE_ADMIN
 }

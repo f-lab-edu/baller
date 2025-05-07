@@ -1,16 +1,13 @@
 package com.baller.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
+import com.baller.domain.enums.RoleType;
+import lombok.*;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Member {
 
     private Long id;
@@ -23,6 +20,6 @@ public class Member {
 
     private String phoneNumber;
 
-    private List<Role> roles;
+    private RoleType role;
 
 }

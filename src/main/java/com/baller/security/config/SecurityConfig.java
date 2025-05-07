@@ -3,8 +3,8 @@ package com.baller.security.config;
 import com.baller.security.filter.JwtAuthFilter;
 import com.baller.security.filter.JwtExceptionFilter;
 import com.baller.security.filter.LoginFilter;
-import com.baller.security.handler.Http401Handler;
-import com.baller.security.handler.Http403Handler;
+import com.baller.security.handler.JwtAuthenticationEntryPoint;
+import com.baller.security.handler.JwtAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +21,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final Http401Handler http401Handler;
-    private final Http403Handler http403Handler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final LoginFilter    loginFilter;
     private final JwtAuthFilter  jwtAuthFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -44,8 +44,8 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(http401Handler)
-                        .accessDeniedHandler(http403Handler)
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

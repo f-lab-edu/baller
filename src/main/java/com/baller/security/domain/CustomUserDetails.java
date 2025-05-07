@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -30,9 +30,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return member.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
-                .collect(Collectors.toList());
+        return List.of(new SimpleGrantedAuthority(member.getRole().name()));
     }
 
 }

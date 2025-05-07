@@ -1,9 +1,8 @@
 package com.baller.application.service;
 
 import com.baller.common.exception.AlreadyExistsEmailException;
-import com.baller.domain.enums.EnumRole;
+import com.baller.domain.enums.RoleType;
 import com.baller.domain.model.Member;
-import com.baller.domain.model.Role;
 import com.baller.infrastructure.mapper.MemberMapper;
 import com.baller.presentation.dto.request.member.SignUpRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,16 +27,10 @@ public class MemberService {
                 .password(encoder.encode(request.getPassword()))
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
+                .role(RoleType.ROLE_MEMBER)
                 .build();
 
         memberMapper.signUp(member);
-
-        Role role = Role.builder()
-                .memberId(member.getId())
-                .role(EnumRole.ROLE_MEMBER)
-                .build();
-
-        memberMapper.insertMemberRole(role);
 
     }
 
