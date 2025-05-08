@@ -1,7 +1,6 @@
 package com.baller.application.service;
 
 import com.baller.common.exception.AlreadyExistsEmailException;
-import com.baller.domain.enums.RoleType;
 import com.baller.domain.model.Member;
 import com.baller.infrastructure.mapper.MemberMapper;
 import com.baller.presentation.dto.request.member.SignUpRequest;
@@ -22,15 +21,7 @@ public class MemberService {
 
         validateDuplicateEmail(request.getEmail());
 
-        Member member = Member.builder()
-                .email(request.getEmail())
-                .password(encoder.encode(request.getPassword()))
-                .name(request.getName())
-                .phoneNumber(request.getPhoneNumber())
-                .role(RoleType.ROLE_MEMBER)
-                .build();
-
-        memberMapper.signUp(member);
+        memberMapper.signUp(Member.ofUser(request, encoder));
 
     }
 
