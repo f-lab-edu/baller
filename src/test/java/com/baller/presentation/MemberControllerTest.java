@@ -1,5 +1,7 @@
 package com.baller.presentation;
 
+import com.baller.application.service.MemberService;
+import com.baller.presentation.dto.request.member.LoginRequest;
 import com.baller.presentation.dto.request.member.SignUpRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -26,15 +28,18 @@ public class MemberControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private MemberService memberService;
+
     @Test
     @DisplayName("회원가입")
     void signUpControllerTest() throws Exception {
         // given
         SignUpRequest signup = SignUpRequest.builder()
                 .email("test@flab.com")
-                .password("12345678")
+                .password("Flab@1234")
                 .name("테스트")
-                .phoneNumber("01022223333")
+                .phoneNumber("010-2222-3333")
                 .build();
 
         // expected
@@ -44,4 +49,57 @@ public class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("로그인 성공")
+    void loginSuccessControllerTest() throws Exception {
+        // given
+        SignUpRequest signup = SignUpRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .name("테스트")
+                .phoneNumber("010-2222-3333")
+                .build();
+
+        memberService.signUp(signup);
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("로그인 실패")
+    void loginFailControllerTest() throws Exception {
+        // given
+        SignUpRequest signup = SignUpRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .name("테스트")
+                .phoneNumber("010-2222-3333")
+                .build();
+
+        memberService.signUp(signup);
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@12345")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
 }
