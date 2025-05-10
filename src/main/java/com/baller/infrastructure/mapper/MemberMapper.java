@@ -1,10 +1,7 @@
 package com.baller.infrastructure.mapper;
 
 import com.baller.domain.model.Member;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Optional;
 
@@ -20,5 +17,8 @@ public interface MemberMapper {
 
     @Select("SELECT ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER, ROLE FROM MEMBERS WHERE EMAIL = #{email}")
     Optional<Member> findByEmail(String email);
+
+    @Update("UPDATE MEMBERS SET PASSWORD = #{password}, NAME = #{name}, PHONE_NUMBER = #{phoneNumber} WHERE ID = #{id}")
+    void updateById(Member member);
 
 }
