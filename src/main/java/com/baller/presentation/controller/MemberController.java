@@ -1,7 +1,6 @@
 package com.baller.presentation.controller;
 
 import com.baller.application.service.MemberService;
-import com.baller.domain.model.Member;
 import com.baller.presentation.dto.request.member.SignUpRequest;
 import com.baller.presentation.dto.request.member.UpdateMemberRequest;
 import com.baller.presentation.dto.response.member.MemberResponse;

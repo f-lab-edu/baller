@@ -5,10 +5,7 @@ import com.baller.domain.model.Member;
 import com.baller.infrastructure.mapper.MemberMapper;
 import com.baller.presentation.dto.request.member.SignUpRequest;
 import com.baller.presentation.dto.request.member.UpdateMemberRequest;
-import com.baller.presentation.dto.response.member.MemberResponse;
-import com.baller.security.domain.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +32,7 @@ public class MemberService {
         }
     }
 
+    @Transactional
     public void updateMember(Long memberId, UpdateMemberRequest request) {
         memberMapper.updateById(
                 Member.builder()
