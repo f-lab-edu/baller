@@ -48,7 +48,7 @@ public class LoginConfig {
     }
 
     @Bean
-    public LoginFilter authProcessingFilter() {
+    public LoginFilter loginFilter() {
         LoginFilter filter = new LoginFilter("/api/members/login", objectMapper);
         filter.setAuthenticationManager(authenticationManager());
         filter.setAuthenticationSuccessHandler(loginSuccessHandler);

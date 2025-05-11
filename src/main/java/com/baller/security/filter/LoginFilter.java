@@ -22,11 +22,11 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
-        LoginRequest authenticationRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+        LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
-                authenticationRequest.getEmail(),
-                authenticationRequest.getPassword()
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
         );
 
         token.setDetails(this.authenticationDetailsSource.buildDetails(request));
