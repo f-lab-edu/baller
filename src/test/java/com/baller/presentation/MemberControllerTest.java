@@ -187,6 +187,15 @@ public class MemberControllerTest {
                 ).andExpect(status().isOk())
                 .andDo(print());
 
+        // then - 수정된 정보 조회 및 검증
+        mockMvc.perform(get("/api/members/me")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("테스트둘"))
+                .andExpect(jsonPath("$.phoneNumber").value("010-3333-4444"))
+                .andDo(print());
+
     }
 
 }

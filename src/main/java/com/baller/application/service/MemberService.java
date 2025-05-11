@@ -35,27 +35,15 @@ public class MemberService {
         }
     }
 
-    public MemberResponse getMember() {
-        return MemberResponse.fromMember(getUserDetails());
-    }
-
-    public void updateMember(UpdateMemberRequest request) {
+    public void updateMember(Long memberId, UpdateMemberRequest request) {
         memberMapper.updateById(
                 Member.builder()
-                        .id(getUserDetails().getId())
+                        .id(memberId)
                         .password(encoder.encode(request.getPassword()))
                         .name(request.getName())
                         .phoneNumber(request.getPhoneNumber())
                         .build()
         );
-    }
-
-    private Member getUserDetails() {
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        return userDetails.getMember();
     }
 
 }
