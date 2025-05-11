@@ -198,4 +198,49 @@ public class MemberControllerTest {
 
     }
 
+    @Test
+    @DisplayName("회원 탈퇴")
+    void deleteMemberControllerTest() throws Exception {
+        // given
+        //회원가입
+        SignUpRequest signup = SignUpRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .name("테스트")
+                .phoneNumber("010-2222-3333")
+                .build();
+
+        memberService.signUp(signup);
+
+        //로그인
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult result = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //accessToken 추출
+        String responseJson = result.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(delete("/api/members/me")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(print());
+
+        //then 삭제 후 정보 조회 → 실패 예상
+        mockMvc.perform(get("/api/members/me")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andDo(print());
+    }
+
 }

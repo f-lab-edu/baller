@@ -44,4 +44,10 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        memberService.deleteMember(userDetails.getMember().getId());
+        return ResponseEntity.ok().build();
+    }
+
 }
