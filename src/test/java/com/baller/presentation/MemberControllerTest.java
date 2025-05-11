@@ -1,6 +1,7 @@
 package com.baller.presentation;
 
 import com.baller.application.service.MemberService;
+import com.baller.infrastructure.mapper.MemberMapper;
 import com.baller.presentation.dto.request.member.LoginRequest;
 import com.baller.presentation.dto.request.member.SignUpRequest;
 import com.baller.presentation.dto.request.member.UpdateMemberRequest;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,6 +36,9 @@ public class MemberControllerTest {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberMapper memberMapper;
 
     @Test
     @DisplayName("회원가입")
@@ -235,12 +240,9 @@ public class MemberControllerTest {
                 ).andExpect(status().isOk())
                 .andDo(print());
 
-        //then 삭제 후 정보 조회 → 실패 예상
-        mockMvc.perform(get("/api/members/me")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andDo(print());
+        //then 삭제 후 정보 조회
+        assertFalse(memberMapper.existsByEmail(loginRequest.getEmail()));
+
     }
 
 }
