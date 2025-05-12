@@ -47,7 +47,7 @@ public class MemberController {
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
         memberService.deleteMember(userDetails.getMember().getId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }
