@@ -44,4 +44,9 @@ public class MemberService {
         );
     }
 
+    @Transactional
+    public void deleteMember(Long memberId) {
+        memberMapper.deleteById(memberId);
+    }
+
 }

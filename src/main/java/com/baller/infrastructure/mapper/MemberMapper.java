@@ -21,4 +21,7 @@ public interface MemberMapper {
     @Update("UPDATE MEMBERS SET PASSWORD = #{password}, NAME = #{name}, PHONE_NUMBER = #{phoneNumber} WHERE ID = #{id}")
     void updateById(Member member);
 
+    @Delete("DELETE FROM MEMBERS WHERE ID = #{id}")
+    void deleteById(Long id);
+
 }

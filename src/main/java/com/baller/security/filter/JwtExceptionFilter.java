@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -36,6 +37,9 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         } catch (JwtException ex) {
             log.error("JwtException: {}", ex.getMessage());
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT 인증 오류");
+        } catch (UsernameNotFoundException ex) {
+            log.error("UsernameNotFoundException: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "존재하지 않는 사용자입니다.");
         } catch (Exception ex) {
             log.error("Exception: {}", ex.getMessage());
             sendErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "SPRING-SECURITY INTERNAL_SERVER_ERROR");
