@@ -1,7 +1,7 @@
 package com.baller.domain.model;
 
-import com.baller.domain.enums.MemberRoleType;
-import com.baller.domain.enums.MemberStatusType;
+import com.baller.domain.enums.ClubRoleType;
+import com.baller.domain.enums.ClubMemberStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,16 +19,16 @@ public class MemberClub {
 
     private Long clubId;
 
-    private MemberRoleType memberRole;
+    private ClubRoleType memberRole;
 
-    private MemberStatusType status;
+    private ClubMemberStatusType status;
 
     public static MemberClub ofLeader(Long member, Long clubId) {
         return MemberClub.builder()
                 .memberId(member)
                 .clubId(clubId)
-                .memberRole(MemberRoleType.LEADER)
-                .status(MemberStatusType.APPROVED)
+                .memberRole(ClubRoleType.LEADER)
+                .status(ClubMemberStatusType.APPROVED)
                 .build();
     }
 

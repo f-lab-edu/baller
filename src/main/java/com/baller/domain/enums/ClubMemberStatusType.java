@@ -1,6 +1,6 @@
 package com.baller.domain.enums;
 
-public enum MemberStatusType {
+public enum ClubMemberStatusType {
 
     PENDING,    // 신청
     APPROVED,   // 승인

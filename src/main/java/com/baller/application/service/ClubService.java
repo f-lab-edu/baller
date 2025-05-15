@@ -7,6 +7,7 @@ import com.baller.infrastructure.mapper.MemberClubMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class ClubService {
     private final ClubMapper clubMapper;
     private final MemberClubMapper memberClubMapper;
 
+    @Transactional
     public void createClub(Long memberId, CreateClubRequest createClubRequest) {
 
         Club club = Club.builder()
