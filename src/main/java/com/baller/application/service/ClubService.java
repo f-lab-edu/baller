@@ -47,7 +47,7 @@ public class ClubService {
 
     public ClubResponse getClubById(Long clubId) {
         Club club = clubMapper.getClubById(clubId);
-        if(club == null) {
+        if (club == null) {
             throw new ClubNotFoundException(clubId);
         }
         return ClubResponse.fromClub(club);

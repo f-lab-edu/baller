@@ -2,7 +2,7 @@ package com.baller.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ClubNotFoundException  extends BaseException{
+public class ClubNotFoundException  extends BaseException {
 
     private static final String MESSAGE = "해당 동아리를 찾을 수 없습니다.";
 
