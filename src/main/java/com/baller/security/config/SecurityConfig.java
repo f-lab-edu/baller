@@ -8,6 +8,7 @@ import com.baller.security.handler.JwtAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,9 +28,14 @@ public class SecurityConfig {
     private final JwtAuthFilter  jwtAuthFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
 
-    private static final String[] WHITE_LIST_URL = {
+    private static final String[] WHITE_LIST_POST_URL = {
             "/api/members",
             "/api/members/login"
+    };
+
+    private static final String[] WHITE_LIST_GET_URL = {
+            "/api/clubs",
+            "/api/clubs/*"
     };
 
     @Bean
@@ -37,8 +43,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITE_LIST_URL)
-                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, WHITE_LIST_POST_URL).permitAll()
+                        .requestMatchers(HttpMethod.GET, WHITE_LIST_GET_URL).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
