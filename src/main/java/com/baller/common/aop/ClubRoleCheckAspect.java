@@ -1,0 +1,42 @@
+package com.baller.common.aop;
+
+import com.baller.common.annotation.RequireClubRole;
+import com.baller.domain.enums.ClubRoleType;
+import com.baller.domain.model.MemberClub;
+import com.baller.infrastructure.mapper.MemberClubMapper;
+import com.baller.security.domain.CustomUserDetails;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Aspect
+@Component
+@RequiredArgsConstructor
+public class ClubRoleCheckAspect {
+
+    private final MemberClubMapper memberClubMapper;
+
+    @Before("@annotation(requireClubRole) && args(clubId,..)")
+    public void beforeClubRoleCheck(JoinPoint joinPoint, RequireClubRole requireClubRole,  Long clubId) {
+
+        CustomUserDetails userDetails = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = userDetails.getMember().getId();
+
+        MemberClub memberClub = memberClubMapper.findByMemberIdAndClubId(memberId, clubId)
+                .orElseThrow(() -> new AccessDeniedException("해당 동아리의 회원이 아닙니다."));
+
+        ClubRoleType userRole = memberClub.getMemberRole();
+        List<ClubRoleType> allowRoles = List.of(requireClubRole.value());
+
+        if(!allowRoles.contains(userRole)) {
+            throw new AccessDeniedException("해당 기능을 사용할 동아리 권한이 없습니다.");
+        }
+    }
+
+}

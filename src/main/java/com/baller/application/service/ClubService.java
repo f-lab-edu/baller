@@ -1,12 +1,15 @@
 package com.baller.application.service;
 
+import com.baller.common.annotation.RequireClubRole;
 import com.baller.common.exception.ClubNotFoundException;
+import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.ClubStatusType;
 import com.baller.domain.model.Club;
 import com.baller.domain.model.MemberClub;
 import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.infrastructure.mapper.MemberClubMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
+import com.baller.presentation.dto.request.club.UpdateClubRequest;
 import com.baller.presentation.dto.response.club.ClubResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,19 @@ public class ClubService {
             throw new ClubNotFoundException(clubId);
         }
         return ClubResponse.fromClub(club);
+    }
+
+    @Transactional
+    @RequireClubRole({ClubRoleType.LEADER, ClubRoleType.MANAGER})
+    public void updateClub(Long clubId, UpdateClubRequest request) {
+        clubMapper.updateClub(
+                Club.builder()
+                        .id(clubId)
+                        .name(request.getName())
+                        .sportType(request.getSportType())
+                        .description(request.getDescription())
+                        .build()
+        );
     }
 
 }
