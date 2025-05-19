@@ -9,4 +9,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface RequireClubRole {
     ClubRoleType[] value();
+    String clubIdParam() default "clubId"; //파라미터 이름이 "clubId"인 값을 찾음
 }
