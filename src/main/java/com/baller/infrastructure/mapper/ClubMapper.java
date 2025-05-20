@@ -1,10 +1,7 @@
 package com.baller.infrastructure.mapper;
 
 import com.baller.domain.model.Club;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -20,5 +17,8 @@ public interface ClubMapper {
 
     @Select("SELECT ID, NAME, SPORT_TYPE, DESCRIPTION FROM CLUBS WHERE id = #{id}")
     Club getClubById(Long id);
+
+    @Update("UPDATE CLUBS SET NAME=#{name}, SPORT_TYPE=#{sportType}, DESCRIPTION=#{description} WHERE ID = #{id}")
+    void updateClub(Club club);
 
 }

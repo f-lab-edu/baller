@@ -2,6 +2,7 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.ClubService;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
+import com.baller.presentation.dto.request.club.UpdateClubRequest;
 import com.baller.presentation.dto.response.club.ClubResponse;
 import com.baller.security.domain.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -36,6 +37,12 @@ public class ClubController {
     @GetMapping("/{id}")
     public ResponseEntity<ClubResponse> getClubById(@PathVariable Long id) {
         return ResponseEntity.ok(clubService.getClubById(id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateClub(@PathVariable long id, @Valid @RequestBody UpdateClubRequest updateClubRequest) {
+        clubService.updateClub(id, updateClubRequest);
+        return ResponseEntity.ok().build();
     }
 
 }
