@@ -69,4 +69,10 @@ public class ClubService {
         );
     }
 
+    @Transactional
+    @RequireClubRole({ClubRoleType.LEADER})
+    public void deleteClub(Long clubId) {
+        clubMapper.deleteClub(clubId, ClubStatusType.DELETE.toString());
+    }
+
 }
