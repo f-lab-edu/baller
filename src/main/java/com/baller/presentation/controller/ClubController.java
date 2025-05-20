@@ -45,4 +45,10 @@ public class ClubController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteClub(@PathVariable Long id) {
+        clubService.deleteClub(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

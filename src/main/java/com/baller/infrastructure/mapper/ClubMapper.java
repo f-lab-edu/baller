@@ -21,4 +21,7 @@ public interface ClubMapper {
     @Update("UPDATE CLUBS SET NAME=#{name}, SPORT_TYPE=#{sportType}, DESCRIPTION=#{description} WHERE ID = #{id}")
     void updateClub(Club club);
 
+    @Update("UPDATE CLUBS SET STATUS = #{status} WHERE ID = #{id}")
+    void deleteClub(Long id, String status);
+
 }
