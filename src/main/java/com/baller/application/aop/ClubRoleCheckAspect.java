@@ -26,7 +26,7 @@ public class ClubRoleCheckAspect {
     @Before("@annotation(requireClubRole)")
     public void beforeClubRoleCheck(JoinPoint joinPoint, RequireClubRole requireClubRole) {
 
-        String paramName = requireClubRole.clubIdParam(); //어노테이션으로부터 파라미터 이름 추출(clubId)
+        String paramName = requireClubRole.clubIdParam();
         Long clubId = extractClubIdFromArgs(joinPoint, paramName);
 
         CustomUserDetails userDetails = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -46,10 +46,9 @@ public class ClubRoleCheckAspect {
     private Long extractClubIdFromArgs(JoinPoint joinPoint, String paramName) {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        String[] paramNames = signature.getParameterNames(); //메서드 파라미터 이름들 추출
-        Object[] args = joinPoint.getArgs(); //메서드 실제 값들
+        String[] paramNames = signature.getParameterNames();
+        Object[] args = joinPoint.getArgs();
 
-        //파라미터 이름 배열을 돌면서 clubIdParam에 해당하는 값 찾기
         for (int i = 0; i < paramNames.length; i++) {
             if (paramNames[i].equals(paramName)) {
                 return (Long) args[i];
