@@ -32,4 +32,13 @@ public class MemberClub {
                 .build();
     }
 
+    public static MemberClub ofParticipant(Long memberId, Long clubId) {
+        return MemberClub.builder()
+                .memberId(memberId)
+                .clubId(clubId)
+                .memberRole(ClubRoleType.PARTICIPANT)
+                .status(ClubMemberStatusType.PENDING)
+                .build();
+    }
+
 }

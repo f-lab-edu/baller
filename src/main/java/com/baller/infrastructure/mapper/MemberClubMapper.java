@@ -15,4 +15,7 @@ public interface MemberClubMapper {
 
     @Select("SELECT ID, MEMBER_ID, CLUB_ID, MEMBER_ROLE, STATUS FROM MEMBER_CLUBS WHERE MEMBER_ID = #{memberId} AND CLUB_ID = #{clubId}")
     Optional<MemberClub> findByMemberIdAndClubId(Long memberId, Long clubId);
+
+    @Select("SELECT EXISTS (SELECT 1 FROM MEMBER_CLUBS WHERE MEMBER_ID = #{memberId} AND CLUB_ID = #{clubId})")
+    boolean existsByMemberIdAndClubId(Long memberId, Long clubId);
 }

@@ -1,6 +1,7 @@
 package com.baller.application.service;
 
 import com.baller.common.annotation.RequireClubRole;
+import com.baller.common.exception.AlreadyExistsMemberClubException;
 import com.baller.common.exception.ClubNotFoundException;
 import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.ClubStatusType;
@@ -73,6 +74,17 @@ public class ClubService {
     @RequireClubRole({ClubRoleType.LEADER})
     public void deleteClub(Long clubId) {
         clubMapper.deleteClub(clubId, ClubStatusType.DELETE.toString());
+    }
+
+    @Transactional
+    public void joinClub(Long memberId, Long clubId) {
+        if(!clubMapper.existsByClubId(clubId)) {
+            throw new ClubNotFoundException(clubId);
+        } else if (memberClubMapper.existsByMemberIdAndClubId(memberId, clubId)) {
+            throw new AlreadyExistsMemberClubException();
+        } else {
+            memberClubMapper.createMemberClub(MemberClub.ofParticipant(memberId, clubId));
+        }
     }
 
 }

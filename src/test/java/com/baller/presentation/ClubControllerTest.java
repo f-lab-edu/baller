@@ -294,4 +294,82 @@ public class ClubControllerTest {
 
     }
 
+    @Test
+    @DisplayName("동아리 가입 신청")
+    void joinClubControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult loginResult = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(post("/api/clubs/"+1+"/join")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("동아리 가입 신청 실패 - 없는 동아리")
+    void joinClubFail1ControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult loginResult = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(post("/api/clubs/"+99+"/join")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("동아리 가입 신청 실패 - 이미 가입한 동아리")
+    void joinClubFail2ControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult loginResult = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(post("/api/clubs/"+6+"/join")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+    }
+
 }
