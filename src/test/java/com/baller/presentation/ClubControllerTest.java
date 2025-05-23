@@ -313,7 +313,7 @@ public class ClubControllerTest {
         String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
 
         // expected
-        mockMvc.perform(post("/api/clubs/"+1+"/join")
+        mockMvc.perform(post("/api/clubs/"+1+"/apply")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -339,7 +339,7 @@ public class ClubControllerTest {
         String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
 
         // expected
-        mockMvc.perform(post("/api/clubs/"+99+"/join")
+        mockMvc.perform(post("/api/clubs/"+99+"/apply")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
@@ -365,7 +365,33 @@ public class ClubControllerTest {
         String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
 
         // expected
-        mockMvc.perform(post("/api/clubs/"+6+"/join")
+        mockMvc.perform(post("/api/clubs/"+6+"/apply")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("동아리 가입 신청 실패 - 이미 신청한 동아리")
+    void joinClubFail3ControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("test@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult loginResult = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(post("/api/clubs/"+1+"/apply")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
