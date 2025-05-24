@@ -84,13 +84,17 @@ public class ClubService {
     public void applyClub(Long memberId, Long clubId) {
         if (!clubMapper.existsByClubId(clubId)) {
             throw new ClubNotFoundException(clubId);
-        } else if (memberClubMapper.existsByMemberIdAndClubId(memberId, clubId)) {
-            throw new AlreadyExistsMemberClubException();
-        } else if (clubJoinApplyMapper.existsByMemberIdAndClubId(memberId, clubId)) {
-            throw new AlreadyExistsClubJoinApplyException();
-        } else {
-            clubJoinApplyMapper.createClubJoinApply(ClubJoinApply.ofRequested(memberId, clubId));
         }
+
+        if (memberClubMapper.existsByMemberIdAndClubId(memberId, clubId)) {
+            throw new AlreadyExistsMemberClubException();
+        }
+
+        if (clubJoinApplyMapper.existsByMemberIdAndClubId(memberId, clubId)) {
+            throw new AlreadyExistsClubJoinApplyException();
+        }
+
+        clubJoinApplyMapper.createClubJoinApply(ClubJoinApply.ofRequested(memberId, clubId));
     }
 
 }
