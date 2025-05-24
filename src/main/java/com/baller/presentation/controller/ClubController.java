@@ -51,4 +51,10 @@ public class ClubController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/apply")
+    public ResponseEntity<Void> applyClub(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id) {
+        clubService.applyClub(userDetails.getMember().getId(), id);
+        return ResponseEntity.ok().build();
+    }
+
 }

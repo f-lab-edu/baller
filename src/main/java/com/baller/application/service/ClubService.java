@@ -1,11 +1,15 @@
 package com.baller.application.service;
 
 import com.baller.common.annotation.RequireClubRole;
+import com.baller.common.exception.AlreadyExistsClubJoinApplyException;
+import com.baller.common.exception.AlreadyExistsMemberClubException;
 import com.baller.common.exception.ClubNotFoundException;
 import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.ClubStatusType;
 import com.baller.domain.model.Club;
+import com.baller.domain.model.ClubJoinApply;
 import com.baller.domain.model.MemberClub;
+import com.baller.infrastructure.mapper.ClubJoinApplyMapper;
 import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.infrastructure.mapper.MemberClubMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
@@ -24,6 +28,7 @@ public class ClubService {
 
     private final ClubMapper clubMapper;
     private final MemberClubMapper memberClubMapper;
+    private final ClubJoinApplyMapper clubJoinApplyMapper;
 
     @Transactional
     public void createClub(Long memberId, CreateClubRequest createClubRequest) {
@@ -73,6 +78,23 @@ public class ClubService {
     @RequireClubRole({ClubRoleType.LEADER})
     public void deleteClub(Long clubId) {
         clubMapper.deleteClub(clubId, ClubStatusType.DELETE.toString());
+    }
+
+    @Transactional
+    public void applyClub(Long memberId, Long clubId) {
+        if (!clubMapper.existsByClubId(clubId)) {
+            throw new ClubNotFoundException(clubId);
+        }
+
+        if (memberClubMapper.existsByMemberIdAndClubId(memberId, clubId)) {
+            throw new AlreadyExistsMemberClubException();
+        }
+
+        if (clubJoinApplyMapper.existsByMemberIdAndClubId(memberId, clubId)) {
+            throw new AlreadyExistsClubJoinApplyException();
+        }
+
+        clubJoinApplyMapper.createClubJoinApply(ClubJoinApply.ofRequested(memberId, clubId));
     }
 
 }

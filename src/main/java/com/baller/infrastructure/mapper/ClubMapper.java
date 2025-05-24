@@ -24,4 +24,7 @@ public interface ClubMapper {
     @Update("UPDATE CLUBS SET STATUS = #{status} WHERE ID = #{id}")
     void deleteClub(Long id, String status);
 
+    @Select("SELECT EXISTS (SELECT 1 FROM CLUBS WHERE ID = #{id})")
+    boolean existsByClubId(Long id);
+
 }

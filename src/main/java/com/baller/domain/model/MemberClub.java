@@ -14,13 +14,9 @@ import lombok.NoArgsConstructor;
 public class MemberClub {
 
     private Long id;
-
     private Long memberId;
-
     private Long clubId;
-
     private ClubRoleType memberRole;
-
     private ClubMemberStatusType status;
 
     public static MemberClub ofLeader(Long member, Long clubId) {
@@ -28,7 +24,16 @@ public class MemberClub {
                 .memberId(member)
                 .clubId(clubId)
                 .memberRole(ClubRoleType.LEADER)
-                .status(ClubMemberStatusType.APPROVED)
+                .status(ClubMemberStatusType.ACTIVE)
+                .build();
+    }
+
+    public static MemberClub ofParticipant(Long memberId, Long clubId) {
+        return MemberClub.builder()
+                .memberId(memberId)
+                .clubId(clubId)
+                .memberRole(ClubRoleType.PARTICIPANT)
+                .status(ClubMemberStatusType.ACTIVE)
                 .build();
     }
 
