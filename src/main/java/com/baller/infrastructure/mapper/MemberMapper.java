@@ -3,6 +3,7 @@ package com.baller.infrastructure.mapper;
 import com.baller.domain.model.Member;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -17,6 +18,16 @@ public interface MemberMapper {
 
     @Select("SELECT ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER, ROLE FROM MEMBERS WHERE EMAIL = #{email}")
     Optional<Member> findByEmail(String email);
+
+    @Select({
+            "<script>",
+            "SELECT ID, EMAIL, NAME, PHONE_NUMBER FROM MEMBERS WHERE ID IN",
+            "<foreach collection='list' item='id' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</script>"
+    })
+    List<Member> findById(@Param("list") List<Long> ids);
 
     @Update("UPDATE MEMBERS SET PASSWORD = #{password}, NAME = #{name}, PHONE_NUMBER = #{phoneNumber} WHERE ID = #{id}")
     void updateById(Member member);

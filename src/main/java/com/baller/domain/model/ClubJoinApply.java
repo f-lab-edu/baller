@@ -32,4 +32,24 @@ public class ClubJoinApply {
                 .build();
     }
 
+    public static ClubJoinApply ofApprove(Long applyId, Long memberId) {
+        return ClubJoinApply.builder()
+                .id(applyId)
+                .status(ClubJoinApplyType.APPROVED)
+                .handledAt(LocalDateTime.now())
+                .handledBy(memberId)
+                .build();
+    }
+
+    public static ClubJoinApply ofRejected(Long applyId, Long memberId, String reason) {
+        return ClubJoinApply.builder()
+                .id(applyId)
+                .status(ClubJoinApplyType.REJECTED)
+                .reason(reason)
+                .handledAt(LocalDateTime.now())
+                .handledBy(memberId)
+                .build();
+    }
+
+
 }
