@@ -1,7 +1,7 @@
 package com.baller.presentation.dto.response.club;
 
-import com.baller.domain.enums.ClubJoinApplyType;
-import com.baller.domain.model.ClubJoinApply;
+import com.baller.domain.enums.ClubApplyType;
+import com.baller.domain.model.ClubApplyRequest;
 import com.baller.domain.model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClubJoinApplyResponse {
+public class ClubApplyResponse {
 
     private Long applyId;
     private Long memberId;
     private Long clubId;
-    private ClubJoinApplyType status;
+    private ClubApplyType status;
     private String reason;
     private LocalDateTime createdDate;
     private String memberEmail;
@@ -26,8 +26,8 @@ public class ClubJoinApplyResponse {
     private String phoneNumber;
 
 
-    public static ClubJoinApplyResponse from(ClubJoinApply apply, Member member) {
-        return ClubJoinApplyResponse.builder()
+    public static ClubApplyResponse from(ClubApplyRequest apply, Member member) {
+        return ClubApplyResponse.builder()
                 .applyId(apply.getId())
                 .memberId(apply.getMemberId())
                 .status(apply.getStatus())
@@ -40,7 +40,7 @@ public class ClubJoinApplyResponse {
     }
 
     @Builder
-    public ClubJoinApplyResponse(Long applyId, ClubJoinApplyType status, String reason, LocalDateTime createdDate, Long memberId, String memberEmail, String memberName, String phoneNumber) {
+    public ClubApplyResponse(Long applyId, ClubApplyType status, String reason, LocalDateTime createdDate, Long memberId, String memberEmail, String memberName, String phoneNumber) {
         this.applyId = applyId;
         this.status = status;
         this.reason = reason;

@@ -1,6 +1,6 @@
 package com.baller.domain.model;
 
-import com.baller.domain.enums.ClubJoinApplyType;
+import com.baller.domain.enums.ClubApplyType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,39 +12,39 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClubJoinApply {
+public class ClubApplyRequest {
 
     private Long id;
     private Long memberId;
     private Long clubId;
-    private ClubJoinApplyType status;
+    private ClubApplyType status;
     private String reason;
     private LocalDateTime createdAt;
     private LocalDateTime handledAt;
     private Long handledBy;
 
-    public static ClubJoinApply ofRequested(Long memberId, Long clubId) {
-        return ClubJoinApply.builder()
+    public static ClubApplyRequest ofRequested(Long memberId, Long clubId) {
+        return ClubApplyRequest.builder()
                 .memberId(memberId)
                 .clubId(clubId)
-                .status(ClubJoinApplyType.REQUESTED)
+                .status(ClubApplyType.REQUESTED)
                 .createdAt(LocalDateTime.now())
                 .build();
     }
 
-    public static ClubJoinApply ofApprove(Long applyId, Long memberId) {
-        return ClubJoinApply.builder()
+    public static ClubApplyRequest ofApprove(Long applyId, Long memberId) {
+        return ClubApplyRequest.builder()
                 .id(applyId)
-                .status(ClubJoinApplyType.APPROVED)
+                .status(ClubApplyType.APPROVED)
                 .handledAt(LocalDateTime.now())
                 .handledBy(memberId)
                 .build();
     }
 
-    public static ClubJoinApply ofRejected(Long applyId, Long memberId, String reason) {
-        return ClubJoinApply.builder()
+    public static ClubApplyRequest ofRejected(Long applyId, Long memberId, String reason) {
+        return ClubApplyRequest.builder()
                 .id(applyId)
-                .status(ClubJoinApplyType.REJECTED)
+                .status(ClubApplyType.REJECTED)
                 .reason(reason)
                 .handledAt(LocalDateTime.now())
                 .handledBy(memberId)

@@ -1,13 +1,13 @@
 package com.baller.presentation;
 
-import com.baller.domain.enums.ClubJoinApplyType;
+import com.baller.domain.enums.ClubApplyType;
 import com.baller.domain.enums.SportType;
 import com.baller.domain.model.Club;
-import com.baller.domain.model.ClubJoinApply;
-import com.baller.infrastructure.mapper.ClubJoinApplyMapper;
+import com.baller.domain.model.ClubApplyRequest;
+import com.baller.infrastructure.mapper.ClubApplyRequestMapper;
 import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
-import com.baller.presentation.dto.request.club.RejectClubJoinApplyRequest;
+import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
 import com.baller.presentation.dto.request.member.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +43,7 @@ public class ClubControllerTest {
     private ClubMapper clubMapper;
 
     @Autowired
-    private ClubJoinApplyMapper clubJoinApplyMapper;
+    private ClubApplyRequestMapper clubApplyRequestMapper;
 
     @Test
     @DisplayName("동아리 생성")
@@ -456,9 +456,9 @@ public class ClubControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        ClubJoinApply apply = clubJoinApplyMapper.findByApplyId(2L);
+        ClubApplyRequest apply = clubApplyRequestMapper.findByApplyId(2L);
         assertNotNull(apply);
-        assertEquals(ClubJoinApplyType.APPROVED, apply.getStatus());
+        assertEquals(ClubApplyType.APPROVED, apply.getStatus());
 
     }
 
@@ -483,14 +483,14 @@ public class ClubControllerTest {
         // expected
         mockMvc.perform(patch("/api/clubs/"+1+"/apply/"+2+"/reject")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                        .content(objectMapper.writeValueAsString(new RejectClubJoinApplyRequest("그냥")))
+                        .content(objectMapper.writeValueAsString(new RejectClubApplyRequest("그냥")))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        ClubJoinApply apply = clubJoinApplyMapper.findByApplyId(2L);
+        ClubApplyRequest apply = clubApplyRequestMapper.findByApplyId(2L);
         assertNotNull(apply);
-        assertEquals(ClubJoinApplyType.REJECTED, apply.getStatus());
+        assertEquals(ClubApplyType.REJECTED, apply.getStatus());
 
     }
 

@@ -1,22 +1,22 @@
 package com.baller.application.service;
 
 import com.baller.common.annotation.RequireClubRole;
-import com.baller.common.exception.AlreadyExistsClubJoinApplyException;
+import com.baller.common.exception.AlreadyExistsClubApplyException;
 import com.baller.common.exception.AlreadyExistsMemberClubException;
 import com.baller.common.exception.ClubNotFoundException;
 import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.ClubStatusType;
 import com.baller.domain.model.Club;
-import com.baller.domain.model.ClubJoinApply;
+import com.baller.domain.model.ClubApplyRequest;
 import com.baller.domain.model.Member;
 import com.baller.domain.model.MemberClub;
-import com.baller.infrastructure.mapper.ClubJoinApplyMapper;
+import com.baller.infrastructure.mapper.ClubApplyRequestMapper;
 import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.infrastructure.mapper.MemberClubMapper;
 import com.baller.infrastructure.mapper.MemberMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
-import com.baller.presentation.dto.response.club.ClubJoinApplyResponse;
+import com.baller.presentation.dto.response.club.ClubApplyResponse;
 import com.baller.presentation.dto.response.club.ClubResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class ClubService {
     private final ClubMapper clubMapper;
     private final MemberMapper memberMapper;
     private final MemberClubMapper memberClubMapper;
-    private final ClubJoinApplyMapper clubJoinApplyMapper;
+    private final ClubApplyRequestMapper clubApplyRequestMapper;
 
     @Transactional
     public void createClub(Long memberId, CreateClubRequest createClubRequest) {
@@ -87,7 +87,7 @@ public class ClubService {
     }
 
     @Transactional
-    public void clubJoinApply(Long memberId, Long clubId) {
+    public void applyClub(Long memberId, Long clubId) {
         if (!clubMapper.existsByClubId(clubId)) {
             throw new ClubNotFoundException(clubId);
         }
@@ -96,47 +96,47 @@ public class ClubService {
             throw new AlreadyExistsMemberClubException();
         }
 
-        if (clubJoinApplyMapper.existsByMemberIdAndClubId(memberId, clubId)) {
-            throw new AlreadyExistsClubJoinApplyException();
+        if (clubApplyRequestMapper.existsByMemberIdAndClubId(memberId, clubId)) {
+            throw new AlreadyExistsClubApplyException();
         }
 
-        clubJoinApplyMapper.createClubJoinApply(ClubJoinApply.ofRequested(memberId, clubId));
+        clubApplyRequestMapper.createClubApplyRequest(ClubApplyRequest.ofRequested(memberId, clubId));
     }
 
     @RequireClubRole({ClubRoleType.LEADER})
-    public List<ClubJoinApplyResponse> getClubJoinApply(Long clubId) {
+    public List<ClubApplyResponse> getClubApplyRequests(Long clubId) {
 
-        List<ClubJoinApply> applies = clubJoinApplyMapper.findByClubId(clubId);
+        List<ClubApplyRequest> applies = clubApplyRequestMapper.findByClubId(clubId);
 
         List<Long> memberIds = applies.stream()
-                .map(ClubJoinApply::getMemberId)
+                .map(ClubApplyRequest::getMemberId)
                 .distinct()
                 .toList();
 
-        List<Member> members = memberMapper.findById(memberIds);
+        List<Member> members = memberMapper.findByIds(memberIds);
 
         Map<Long, Member> memberMap = members.stream()
                 .collect(Collectors.toMap(Member::getId, Function.identity()));
 
         return applies.stream()
-                .map(apply -> ClubJoinApplyResponse.from(apply, memberMap.get(apply.getMemberId())))
+                .map(apply -> ClubApplyResponse.from(apply, memberMap.get(apply.getMemberId())))
                 .toList();
 
     }
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER})
-    public void approveClubJoinApply(Long clubId, Long handleId, Long applyId) {
-        clubJoinApplyMapper.updateApplyClub(ClubJoinApply.ofApprove(applyId, handleId));
+    public void approveClubApply(Long clubId, Long handleId, Long applyId) {
+        clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofApprove(applyId, handleId));
 
-        ClubJoinApply apply = clubJoinApplyMapper.findByApplyId(applyId);
+        ClubApplyRequest apply = clubApplyRequestMapper.findByApplyId(applyId);
         memberClubMapper.createMemberClub(MemberClub.ofParticipant(apply.getMemberId(), clubId));
     }
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER})
-    public void rejectClubJoinApply(Long clubId, Long handleId, Long applyId, String reason) {
-        clubJoinApplyMapper.updateApplyClub(ClubJoinApply.ofRejected(applyId, handleId, reason));
+    public void rejectClubApply(Long clubId, Long handleId, Long applyId, String reason) {
+        clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofRejected(applyId, handleId, reason));
     }
 
 }

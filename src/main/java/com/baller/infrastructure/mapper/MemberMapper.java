@@ -27,7 +27,7 @@ public interface MemberMapper {
             "</foreach>",
             "</script>"
     })
-    List<Member> findById(@Param("list") List<Long> ids);
+    List<Member> findByIds(@Param("list") List<Long> ids);
 
     @Update("UPDATE MEMBERS SET PASSWORD = #{password}, NAME = #{name}, PHONE_NUMBER = #{phoneNumber} WHERE ID = #{id}")
     void updateById(Member member);

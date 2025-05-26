@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RejectClubJoinApplyRequest {
+public class RejectClubApplyRequest {
 
     private String reason;
 

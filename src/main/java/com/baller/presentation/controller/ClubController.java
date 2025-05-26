@@ -2,9 +2,9 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.ClubService;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
-import com.baller.presentation.dto.request.club.RejectClubJoinApplyRequest;
+import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
-import com.baller.presentation.dto.response.club.ClubJoinApplyResponse;
+import com.baller.presentation.dto.response.club.ClubApplyResponse;
 import com.baller.presentation.dto.response.club.ClubResponse;
 import com.baller.security.domain.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -54,34 +54,34 @@ public class ClubController {
     }
 
     @PostMapping("/{id}/apply")
-    public ResponseEntity<Void> clubJoinApply(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id) {
-        clubService.clubJoinApply(userDetails.getMember().getId(), id);
+    public ResponseEntity<Void> applyClub(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id) {
+        clubService.applyClub(userDetails.getMember().getId(), id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/apply")
-    public ResponseEntity<List<ClubJoinApplyResponse>> getClubJoinApply(@PathVariable Long id) {
-        return ResponseEntity.ok(clubService.getClubJoinApply(id));
+    public ResponseEntity<List<ClubApplyResponse>> getClubApplyRequests(@PathVariable Long id) {
+        return ResponseEntity.ok(clubService.getClubApplyRequests(id));
     }
 
     @PostMapping("/{clubId}/apply/{applyId}/approve")
-    public ResponseEntity<Void> approveClubJoinApply(
+    public ResponseEntity<Void> approveClubApply(
             @PathVariable Long clubId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long applyId
     ) {
-        clubService.approveClubJoinApply(clubId, userDetails.getMember().getId(), applyId);
+        clubService.approveClubApply(clubId, userDetails.getMember().getId(), applyId);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{clubId}/apply/{applyId}/reject")
-    public ResponseEntity<Void> rejectClubJoinApply(
+    public ResponseEntity<Void> rejectClubApply(
             @PathVariable Long clubId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long applyId,
-            @RequestBody RejectClubJoinApplyRequest reason
+            @RequestBody RejectClubApplyRequest reason
     ) {
-        clubService.rejectClubJoinApply(clubId, userDetails.getMember().getId(), applyId, reason.getReason());
+        clubService.rejectClubApply(clubId, userDetails.getMember().getId(), applyId, reason.getReason());
         return ResponseEntity.ok().build();
     }
 
