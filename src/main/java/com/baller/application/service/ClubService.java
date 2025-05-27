@@ -106,9 +106,9 @@ public class ClubService {
     @RequireClubRole({ClubRoleType.LEADER})
     public List<ClubApplyResponse> getClubApplyRequests(Long clubId) {
 
-        List<ClubApplyRequest> applies = clubApplyRequestMapper.findByClubId(clubId);
+        List<ClubApplyRequest> requests = clubApplyRequestMapper.findByClubId(clubId);
 
-        List<Long> memberIds = applies.stream()
+        List<Long> memberIds = requests.stream()
                 .map(ClubApplyRequest::getMemberId)
                 .distinct()
                 .toList();
@@ -118,7 +118,7 @@ public class ClubService {
         Map<Long, Member> memberMap = members.stream()
                 .collect(Collectors.toMap(Member::getId, Function.identity()));
 
-        return applies.stream()
+        return requests.stream()
                 .map(apply -> ClubApplyResponse.from(apply, memberMap.get(apply.getMemberId())))
                 .toList();
 
@@ -126,17 +126,17 @@ public class ClubService {
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER})
-    public void approveClubApply(Long clubId, Long handleId, Long applyId) {
-        clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofApprove(applyId, handleId));
+    public void approveClubApply(Long clubId, Long handleId, Long requestId) {
+        clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofApprove(requestId, handleId));
 
-        ClubApplyRequest apply = clubApplyRequestMapper.findByApplyId(applyId);
-        memberClubMapper.createMemberClub(MemberClub.ofParticipant(apply.getMemberId(), clubId));
+        ClubApplyRequest request = clubApplyRequestMapper.findByApplyId(requestId);
+        memberClubMapper.createMemberClub(MemberClub.ofParticipant(request.getMemberId(), clubId));
     }
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER})
-    public void rejectClubApply(Long clubId, Long handleId, Long applyId, String reason) {
-        clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofRejected(applyId, handleId, reason));
+    public void rejectClubApply(Long clubId, Long requestId, Long handleId, String reason) {
+        clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofRejected(requestId, handleId, reason));
     }
 
 }

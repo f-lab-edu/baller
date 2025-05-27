@@ -32,18 +32,18 @@ public class ClubApplyRequest {
                 .build();
     }
 
-    public static ClubApplyRequest ofApprove(Long applyId, Long memberId) {
+    public static ClubApplyRequest ofApprove(Long requestId, Long memberId) {
         return ClubApplyRequest.builder()
-                .id(applyId)
+                .id(requestId)
                 .status(ClubApplyType.APPROVED)
                 .handledAt(LocalDateTime.now())
                 .handledBy(memberId)
                 .build();
     }
 
-    public static ClubApplyRequest ofRejected(Long applyId, Long memberId, String reason) {
+    public static ClubApplyRequest ofRejected(Long requestId, Long memberId, String reason) {
         return ClubApplyRequest.builder()
-                .id(applyId)
+                .id(requestId)
                 .status(ClubApplyType.REJECTED)
                 .reason(reason)
                 .handledAt(LocalDateTime.now())
