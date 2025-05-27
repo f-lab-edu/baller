@@ -2,7 +2,9 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.ClubService;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
+import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
+import com.baller.presentation.dto.response.club.ClubApplyResponse;
 import com.baller.presentation.dto.response.club.ClubResponse;
 import com.baller.security.domain.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -54,6 +56,32 @@ public class ClubController {
     @PostMapping("/{id}/apply")
     public ResponseEntity<Void> applyClub(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id) {
         clubService.applyClub(userDetails.getMember().getId(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/apply")
+    public ResponseEntity<List<ClubApplyResponse>> getClubApplyRequests(@PathVariable Long id) {
+        return ResponseEntity.ok(clubService.getClubApplyRequests(id));
+    }
+
+    @PostMapping("/{clubId}/apply/{applyId}/approve")
+    public ResponseEntity<Void> approveClubApply(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long applyId
+    ) {
+        clubService.approveClubApply(clubId, userDetails.getMember().getId(), applyId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{clubId}/apply/{applyId}/reject")
+    public ResponseEntity<Void> rejectClubApply(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long applyId,
+            @RequestBody RejectClubApplyRequest reason
+    ) {
+        clubService.rejectClubApply(clubId, userDetails.getMember().getId(), applyId, reason.getReason());
         return ResponseEntity.ok().build();
     }
 
