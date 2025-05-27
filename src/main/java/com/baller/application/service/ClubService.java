@@ -129,7 +129,7 @@ public class ClubService {
     public void approveClubApply(Long clubId, Long handleId, Long requestId) {
         clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofApprove(requestId, handleId));
 
-        ClubApplyRequest request = clubApplyRequestMapper.findByApplyId(requestId);
+        ClubApplyRequest request = clubApplyRequestMapper.findByRequestId(requestId);
         memberClubMapper.createMemberClub(MemberClub.ofParticipant(request.getMemberId(), clubId));
     }
 

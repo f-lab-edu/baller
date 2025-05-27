@@ -18,7 +18,7 @@ public interface ClubApplyRequestMapper {
     void createClubApplyRequest(ClubApplyRequest clubApplyRequest);
 
     @Select("SELECT ID, MEMBER_ID, CLUB_ID, STATUS, REASON, CREATED_AT, HANDLED_AT, HANDLED_BY FROM CLUB_APPLY_REQUESTS WHERE ID = #{requestId}")
-    ClubApplyRequest findByApplyId(Long requestId);
+    ClubApplyRequest findByRequestId(Long requestId);
 
     @Select("SELECT ID, MEMBER_ID, CLUB_ID, STATUS, REASON, CREATED_AT, HANDLED_AT, HANDLED_BY FROM CLUB_APPLY_REQUESTS WHERE CLUB_ID=#{clubId}")
     List<ClubApplyRequest> findByClubId(Long clubId);
