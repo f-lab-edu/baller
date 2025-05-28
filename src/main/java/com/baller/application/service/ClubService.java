@@ -4,6 +4,7 @@ import com.baller.common.annotation.RequireClubRole;
 import com.baller.common.exception.AlreadyExistsClubApplyException;
 import com.baller.common.exception.AlreadyExistsMemberClubException;
 import com.baller.common.exception.ClubNotFoundException;
+import com.baller.domain.enums.ClubMemberStatusType;
 import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.ClubStatusType;
 import com.baller.domain.model.Club;
@@ -137,6 +138,11 @@ public class ClubService {
     @RequireClubRole({ClubRoleType.LEADER})
     public void rejectClubApply(Long clubId, Long requestId, Long handleId, String reason) {
         clubApplyRequestMapper.updateClubApplyRequest(ClubApplyRequest.ofRejected(requestId, handleId, reason));
+    }
+
+    @Transactional
+    public void withdrawMemberClub(Long memberId, Long clubId) {
+        memberClubMapper.withdrawMemberClub(memberId, clubId, ClubMemberStatusType.WITHDRAWN);
     }
 
 }

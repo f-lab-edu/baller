@@ -1,9 +1,11 @@
 package com.baller.infrastructure.mapper;
 
+import com.baller.domain.enums.ClubMemberStatusType;
 import com.baller.domain.model.MemberClub;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.Optional;
 
@@ -18,4 +20,8 @@ public interface MemberClubMapper {
 
     @Select("SELECT EXISTS (SELECT 1 FROM MEMBER_CLUBS WHERE MEMBER_ID = #{memberId} AND CLUB_ID = #{clubId})")
     boolean existsByMemberIdAndClubId(Long memberId, Long clubId);
+
+    @Update("UPDATE MEMBER_CLUBS SET STATUS = #{memberStatusType} WHERE MEMBER_ID = #{memberId} AND CLUB_ID = #{clubId}")
+    void withdrawMemberClub(Long memberId, Long clubId, ClubMemberStatusType memberStatusType);
+
 }

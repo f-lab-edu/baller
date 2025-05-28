@@ -85,4 +85,10 @@ public class ClubController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{id}/withdraw")
+    public ResponseEntity<Void> withdrawMemberClub(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id) {
+        clubService.withdrawMemberClub(userDetails.getMember().getId(), id);
+        return ResponseEntity.ok().build();
+    }
+
 }
