@@ -91,4 +91,10 @@ public class ClubController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{clubId}/members/{memberId}/role")
+    public ResponseEntity<Void> updateMemberClubRole(@PathVariable Long clubId, @PathVariable Long memberId) {
+        clubService.updateMemberClubRole(clubId, memberId);
+        return ResponseEntity.ok().build();
+    }
+
 }

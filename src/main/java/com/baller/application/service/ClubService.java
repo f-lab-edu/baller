@@ -145,4 +145,10 @@ public class ClubService {
         memberClubMapper.withdrawMemberClub(memberId, clubId, ClubMemberStatusType.WITHDRAWN);
     }
 
+    @Transactional
+    @RequireClubRole({ClubRoleType.LEADER})
+    public void updateMemberClubRole(Long clubId, Long memberId) {
+        memberClubMapper.updateMemberClubRole(clubId, memberId, ClubRoleType.MANAGER);
+    }
+
 }

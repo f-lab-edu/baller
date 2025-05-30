@@ -520,4 +520,30 @@ public class ClubControllerTest {
 
     }
 
+    @Test
+    @DisplayName("동아리 역할 변경")
+    void updateMemberClubRoleClubControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("club@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult loginResult = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(patch("/api/clubs/"+6+"/members/"+28+"/role")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
 }
