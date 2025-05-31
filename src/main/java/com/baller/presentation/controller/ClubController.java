@@ -1,6 +1,7 @@
 package com.baller.presentation.controller;
 
 import com.baller.application.service.ClubService;
+import com.baller.domain.enums.ClubRoleType;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
 import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
@@ -93,7 +94,7 @@ public class ClubController {
 
     @PatchMapping("/{clubId}/members/{memberId}/role")
     public ResponseEntity<Void> updateMemberClubRole(@PathVariable Long clubId, @PathVariable Long memberId) {
-        clubService.updateMemberClubRole(clubId, memberId);
+        clubService.updateMemberClubRole(clubId, memberId, ClubRoleType.MANAGER);
         return ResponseEntity.ok().build();
     }
 

@@ -147,8 +147,8 @@ public class ClubService {
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER})
-    public void updateMemberClubRole(Long clubId, Long memberId) {
-        memberClubMapper.updateMemberClubRole(clubId, memberId, ClubRoleType.MANAGER);
+    public void updateMemberClubRole(Long clubId, Long memberId, ClubRoleType role) {
+        memberClubMapper.updateMemberClubRole(clubId, memberId, role);
     }
 
 }
