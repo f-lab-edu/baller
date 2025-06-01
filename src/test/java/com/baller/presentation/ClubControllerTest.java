@@ -1,6 +1,7 @@
 package com.baller.presentation;
 
 import com.baller.domain.enums.ClubApplyType;
+import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.SportType;
 import com.baller.domain.model.Club;
 import com.baller.domain.model.ClubApplyRequest;
@@ -9,6 +10,7 @@ import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
 import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
+import com.baller.presentation.dto.request.club.UpdateMemberClubRoleRequest;
 import com.baller.presentation.dto.request.member.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -540,7 +542,9 @@ public class ClubControllerTest {
 
         // expected
         mockMvc.perform(patch("/api/clubs/"+6+"/members/"+28+"/role")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .content(objectMapper.writeValueAsString(new UpdateMemberClubRoleRequest(ClubRoleType.MANAGER)))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
 
