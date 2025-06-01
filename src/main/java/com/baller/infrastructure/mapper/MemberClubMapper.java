@@ -1,6 +1,7 @@
 package com.baller.infrastructure.mapper;
 
 import com.baller.domain.enums.ClubMemberStatusType;
+import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.model.MemberClub;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,5 +24,8 @@ public interface MemberClubMapper {
 
     @Update("UPDATE MEMBER_CLUBS SET STATUS = #{memberStatusType} WHERE MEMBER_ID = #{memberId} AND CLUB_ID = #{clubId}")
     void withdrawMemberClub(Long memberId, Long clubId, ClubMemberStatusType memberStatusType);
+
+    @Update("UPDATE MEMBER_CLUBS SET MEMBER_ROLE = #{roleType} WHERE CLUB_ID = #{clubId} AND MEMBER_ID = #{memberId}")
+    void updateMemberClubRole(Long clubId, Long memberId, ClubRoleType roleType);
 
 }

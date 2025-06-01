@@ -1,9 +1,11 @@
 package com.baller.presentation.controller;
 
 import com.baller.application.service.ClubService;
+import com.baller.domain.enums.ClubRoleType;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
 import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
+import com.baller.presentation.dto.request.club.UpdateMemberClubRoleRequest;
 import com.baller.presentation.dto.response.club.ClubApplyResponse;
 import com.baller.presentation.dto.response.club.ClubResponse;
 import com.baller.security.domain.CustomUserDetails;
@@ -88,6 +90,12 @@ public class ClubController {
     @PatchMapping("/{id}/withdraw")
     public ResponseEntity<Void> withdrawMemberClub(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long id) {
         clubService.withdrawMemberClub(userDetails.getMember().getId(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{clubId}/members/{memberId}/role")
+    public ResponseEntity<Void> updateMemberClubRole(@PathVariable Long clubId, @PathVariable Long memberId, @Valid @RequestBody UpdateMemberClubRoleRequest roleType) {
+        clubService.updateMemberClubRole(clubId, memberId, roleType.getRole());
         return ResponseEntity.ok().build();
     }
 

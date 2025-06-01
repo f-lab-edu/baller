@@ -1,6 +1,7 @@
 package com.baller.presentation;
 
 import com.baller.domain.enums.ClubApplyType;
+import com.baller.domain.enums.ClubRoleType;
 import com.baller.domain.enums.SportType;
 import com.baller.domain.model.Club;
 import com.baller.domain.model.ClubApplyRequest;
@@ -9,6 +10,7 @@ import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.presentation.dto.request.club.CreateClubRequest;
 import com.baller.presentation.dto.request.club.RejectClubApplyRequest;
 import com.baller.presentation.dto.request.club.UpdateClubRequest;
+import com.baller.presentation.dto.request.club.UpdateMemberClubRoleRequest;
 import com.baller.presentation.dto.request.member.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -515,6 +517,34 @@ public class ClubControllerTest {
         // expected
         mockMvc.perform(patch("/api/clubs/"+6+"/withdraw")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("동아리 역할 변경")
+    void updateMemberClubRoleClubControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("club@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult loginResult = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        // expected
+        mockMvc.perform(patch("/api/clubs/"+6+"/members/"+28+"/role")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .content(objectMapper.writeValueAsString(new UpdateMemberClubRoleRequest(ClubRoleType.MANAGER)))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
 
