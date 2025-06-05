@@ -20,10 +20,10 @@ public class GameService {
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER, ClubRoleType.MANAGER})
-    public void createGame(Long hostClubId, CreateGameRequest request){
+    public void createGame(Long clubId, CreateGameRequest request){
 
-        if(!clubMapper.existsByClubId(hostClubId)) {
-            throw new ClubNotFoundException(hostClubId);
+        if(!clubMapper.existsByClubId(request.getHostClubId())) {
+            throw new ClubNotFoundException(request.getHostClubId());
         }
 
         if(!clubMapper.existsByClubId(request.getGuestClubId())){
