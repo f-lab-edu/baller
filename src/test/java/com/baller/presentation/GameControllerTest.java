@@ -1,5 +1,6 @@
 package com.baller.presentation;
 
+import com.baller.domain.enums.SportType;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
 import com.baller.presentation.dto.request.member.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,7 @@ public class GameControllerTest {
                 .startTime(LocalDateTime.parse("2025-06-10T14:00"))
                 .hostClubId(6L)
                 .guestClubId(1L)
+                .sportType(SportType.BASKETBALL)
                 .build();
 
         // expected

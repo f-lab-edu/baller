@@ -1,6 +1,7 @@
 package com.baller.domain.model;
 
 import com.baller.domain.enums.GameStatusType;
+import com.baller.domain.enums.SportType;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class Game {
     private int hostScore;
     private int guestScore;
     private GameStatusType status;
+    private SportType sportType;
 
     public static Game ofGameScheduled(CreateGameRequest request) {
         return Game.builder()
@@ -34,6 +36,7 @@ public class Game {
                 .hostScore(0)
                 .guestScore(0)
                 .status(GameStatusType.SCHEDULED)
+                .sportType(request.getSportType())
                 .build();
     }
 

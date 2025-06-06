@@ -1,5 +1,6 @@
 package com.baller.presentation.dto.request.game;
 
+import com.baller.domain.enums.SportType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,5 +27,8 @@ public class CreateGameRequest {
 
     @NotNull(message = "원정팀 아이디를 입력해주세요.")
     private Long guestClubId;
+
+    @NotNull(message = "종목을 입력해주세요.")
+    private SportType sportType;
 
 }

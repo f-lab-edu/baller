@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Options;
 @Mapper
 public interface GameMapper {
 
-    @Insert("INSERT INTO GAMES (TITLE, START_TIME, HOST_CLUB_ID, GUEST_CLUB_ID, HOST_SCORE, GUEST_SCORE, STATUS) VALUES(#{title}, #{startTime}, #{hostClubId}, #{guestClubId}, #{hostScore}, #{guestScore}, #{status})")
+    @Insert("INSERT INTO GAMES (TITLE, START_TIME, HOST_CLUB_ID, GUEST_CLUB_ID, HOST_SCORE, GUEST_SCORE, STATUS, SPORT_TYPE) VALUES(#{title}, #{startTime}, #{hostClubId}, #{guestClubId}, #{hostScore}, #{guestScore}, #{status}, #{sportType})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void createGame(Game game);
 
