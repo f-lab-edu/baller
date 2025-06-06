@@ -39,13 +39,12 @@ services:
     volumes:
       - ./db/postgres/data:/var/lib/postgresql/data
       - ./db/postgres/init:/docker-entrypoint-initdb.d
-#  mysql-exporter:
-#    container_name: mysql-exporter
-#    image: prom/mysqld-exporter
-#    command:
-#      - "--mysqld.username=user:password"
-#      - "--mysqld.address=mysql:3306"
-#    ports:
-#      - "9104:9104"
-#    depends_on:
-#      - mysql
+  postgres-exporter:
+    container_name: postgres-exporter
+    image: quay.io/prometheuscommunity/postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://user:password@postgres:5432/example?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres
