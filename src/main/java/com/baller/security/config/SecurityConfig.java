@@ -36,7 +36,8 @@ public class SecurityConfig {
     private static final String[] WHITE_LIST_GET_URL = {
             "/api/clubs",
             "/api/clubs/*",
-            "/actuator/prometheus"
+            "/actuator/prometheus",
+            "/api/games"
     };
 
     @Bean

@@ -2,13 +2,13 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.GameService;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
+import com.baller.presentation.dto.response.geme.GameResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +21,11 @@ public class GameController {
     public ResponseEntity<Void> createGame(@Valid @RequestBody CreateGameRequest request) {
         gameService.createGame(request.getHostClubId(), request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GameResponse>> getGames() {
+        return ResponseEntity.ok(gameService.getGames());
     }
 
 }

@@ -7,9 +7,12 @@ import com.baller.domain.model.Game;
 import com.baller.infrastructure.mapper.ClubMapper;
 import com.baller.infrastructure.mapper.GameMapper;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
+import com.baller.presentation.dto.response.geme.GameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,13 @@ public class GameService {
         }
 
         gameMapper.createGame(Game.ofGameScheduled(request));
+    }
+
+    public List<GameResponse> getGames(){
+        return gameMapper.getAllGames()
+                .stream()
+                .map(GameResponse::from)
+                .toList();
     }
 
 }
