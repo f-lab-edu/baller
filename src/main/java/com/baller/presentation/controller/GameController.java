@@ -24,8 +24,8 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GameResponse>> getGames() {
-        return ResponseEntity.ok(gameService.getGames());
+    public ResponseEntity<List<GameResponse>> getGames(@RequestParam Long clubId) {
+        return ResponseEntity.ok(gameService.getGames(clubId));
     }
 
 }

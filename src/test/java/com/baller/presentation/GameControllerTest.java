@@ -73,7 +73,7 @@ public class GameControllerTest {
     @DisplayName("경기 목록 조회")
     void getGamesControllerTest() throws Exception {
 
-        mockMvc.perform(get("/api/games"))
+        mockMvc.perform(get("/api/games").param("clubId", "6"))
                 .andExpect(status().isOk())
                 .andDo(print());
 

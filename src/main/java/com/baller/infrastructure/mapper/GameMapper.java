@@ -15,7 +15,7 @@ public interface GameMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void createGame(Game game);
 
-    @Select("SELECT ID, TITLE, START_TIME, END_TIME, HOST_CLUB_ID, GUEST_CLUB_ID, HOST_SCORE, GUEST_SCORE, STATUS, SPORT_TYPE FROM GAMES")
-    List<Game> getAllGames();
+    @Select("SELECT ID, TITLE, START_TIME, END_TIME, HOST_CLUB_ID, GUEST_CLUB_ID, HOST_SCORE, GUEST_SCORE, STATUS, SPORT_TYPE FROM GAMES WHERE HOST_CLUB_ID = #{clubId} OR GUEST_CLUB_ID = #{clubId}")
+    List<Game> getAllGames(Long clubId);
 
 }

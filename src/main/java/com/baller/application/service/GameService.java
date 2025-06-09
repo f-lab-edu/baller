@@ -36,8 +36,8 @@ public class GameService {
         gameMapper.createGame(Game.ofGameScheduled(request));
     }
 
-    public List<GameResponse> getGames(){
-        return gameMapper.getAllGames()
+    public List<GameResponse> getGames(Long clubId){
+        return gameMapper.getAllGames(clubId)
                 .stream()
                 .map(GameResponse::from)
                 .toList();
