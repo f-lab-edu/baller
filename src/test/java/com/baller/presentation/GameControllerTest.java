@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,6 +64,16 @@ public class GameControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("경기 목록 조회")
+    void getGamesControllerTest() throws Exception {
+
+        mockMvc.perform(get("/api/games").param("clubId", "6"))
                 .andExpect(status().isOk())
                 .andDo(print());
 
