@@ -2,6 +2,7 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.GameService;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
+import com.baller.presentation.dto.request.game.StartGameRequest;
 import com.baller.presentation.dto.response.geme.GameResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,12 @@ public class GameController {
     @GetMapping
     public ResponseEntity<List<GameResponse>> getGames(@RequestParam Long clubId) {
         return ResponseEntity.ok(gameService.getGames(clubId));
+    }
+
+    @PostMapping("/{gameId}/start")
+    public ResponseEntity<Void> startGame(@PathVariable Long gameId, @RequestParam Long hostClubId, @RequestBody StartGameRequest request) {
+        gameService.startGame(hostClubId, gameId, request);
+        return ResponseEntity.ok().build();
     }
 
 }
