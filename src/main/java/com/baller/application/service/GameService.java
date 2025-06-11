@@ -61,7 +61,7 @@ public class GameService {
 
         gameMapper.startGame(GameStatusType.IN_PROGRESS, gameId);
 
-        for (ParticipationRequest participation : request.getParticipations()) {
+        for (ParticipationRequest participation : request.getParticipants()) {
 
             Participation p = Participation.builder()
                     .gameId(gameId)

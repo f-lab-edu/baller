@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class StartGameRequest {
 
-    private List<ParticipationRequest> participations;
+    private List<ParticipationRequest> participants;
 
 }
