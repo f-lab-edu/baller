@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasketballRecord {
+public class BasketballRecord extends GameRecord {
 
     private Long id;
     private Long gameRecordId;
