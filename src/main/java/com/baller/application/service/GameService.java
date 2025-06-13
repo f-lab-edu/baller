@@ -71,7 +71,7 @@ public class GameService {
 
             participationMapper.insertParticipation(p);
 
-            GameRecord gameRecord = GameRecord.builder()
+            GameRecord gameRecord = BasketballRecord.builder()
                     .gameId(gameId)
                     .memberId(participation.getMemberId())
                     .clubId(participation.getClubId())
@@ -82,7 +82,7 @@ public class GameService {
 
             if(SportType.BASKETBALL.equals(game.getSportType())) {
                 BasketballRecord basketballRecord = BasketballRecord.builder()
-                        .gameRecordId(gameRecord.getId())
+                        .id(gameRecord.getId())
                         .build();
 
                 basketballRecordMapper.insertBasketballRecord(basketballRecord);
