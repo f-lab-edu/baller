@@ -13,6 +13,7 @@ import com.baller.infrastructure.mapper.*;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
 import com.baller.presentation.dto.request.game.ParticipationRequest;
 import com.baller.presentation.dto.request.game.StartGameRequest;
+import com.baller.presentation.dto.request.game.UpdateBasketballRecordRequest;
 import com.baller.presentation.dto.response.geme.GameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -90,6 +91,15 @@ public class GameService {
             }
 
         }
+
+    }
+
+    @Transactional
+    public void updateBasketballRecord(Long gameId, Long memberId, UpdateBasketballRecordRequest request) {
+
+        Long gameRecordId = gameRecordMapper.findByGameIdAndMemberId(gameId, memberId);
+
+        basketballRecordMapper.updateBasketballRecord(BasketballRecord.of(gameRecordId, request));
 
     }
 

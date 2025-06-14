@@ -1,9 +1,13 @@
 package com.baller.presentation;
 
 import com.baller.domain.enums.SportType;
+import com.baller.domain.model.BasketballRecord;
+import com.baller.infrastructure.mapper.BasketballRecordMapper;
+import com.baller.infrastructure.mapper.GameRecordMapper;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
 import com.baller.presentation.dto.request.game.ParticipationRequest;
 import com.baller.presentation.dto.request.game.StartGameRequest;
+import com.baller.presentation.dto.request.game.UpdateBasketballRecordRequest;
 import com.baller.presentation.dto.request.member.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +39,12 @@ public class GameControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private GameRecordMapper gameRecordMapper;
+
+    @Autowired
+    private BasketballRecordMapper basketballRecordMapper;
 
     @Test
     @DisplayName("경기 생성")
@@ -121,6 +131,43 @@ public class GameControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("경기 시작")
+    void updateBasketballRecordControllerTest() throws Exception {
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email("club@flab.com")
+                .password("Flab@1234")
+                .build();
+
+        MvcResult result = mockMvc.perform(post("/api/members/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = result.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        UpdateBasketballRecordRequest request = UpdateBasketballRecordRequest.builder()
+                .points(3)
+                .build();
+
+        mockMvc.perform(patch("/api/games/{gameId}/members/{memberId}/basketball/record", 3, 29)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Long gameRecordId = gameRecordMapper.findByGameIdAndMemberId(3L, 29L);
+
+        BasketballRecord basketballRecord = basketballRecordMapper.findById(gameRecordId);
+
+        assertEquals(3, basketballRecord.getPoints(), "점수 조작 실패");
 
     }
 
