@@ -3,6 +3,7 @@ package com.baller.presentation.controller;
 import com.baller.application.service.GameService;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
 import com.baller.presentation.dto.request.game.StartGameRequest;
+import com.baller.presentation.dto.request.game.UpdateBasketballRecordRequest;
 import com.baller.presentation.dto.response.geme.GameResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,12 @@ public class GameController {
     @PostMapping("/{gameId}/start")
     public ResponseEntity<Void> startGame(@PathVariable Long gameId, @RequestParam Long hostClubId, @RequestBody StartGameRequest request) {
         gameService.startGame(hostClubId, gameId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{gameId}/members/{memberId}/basketball/record")
+    public ResponseEntity<Void> updateBasketballRecord(@PathVariable Long gameId, @PathVariable Long memberId, @RequestBody UpdateBasketballRecordRequest request) {
+        gameService.updateBasketballRecord(gameId, memberId, request);
         return ResponseEntity.ok().build();
     }
 
