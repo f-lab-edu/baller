@@ -12,13 +12,13 @@ public interface BasketballRecordMapper {
 
     @Update("""
             UPDATE BASKETBALL_RECORDS
-                SET POINTS = #{points},
-                    ASSISTS = #{assists},
-                    REBOUNDS = #{rebounds},
-                    STEALS = #{steals},
-                    BLOCKS = #{blocks},
-                    PLAY_TIME = #{playTime},
-                    FOULS = #{fouls}
+                SET POINTS = POINTS + #{points},
+                    ASSISTS = ASSISTS + #{assists},
+                    REBOUNDS = REBOUNDS + #{rebounds},
+                    STEALS = STEALS + #{steals},
+                    BLOCKS = BLOCKS + #{blocks},
+                    PLAY_TIME = PLAY_TIME + #{playTime},
+                    FOULS = FOULS + #{fouls}
                 WHERE ID = #{id}""")
     void updateBasketballRecord(BasketballRecord basketballRecord);
 
@@ -35,5 +35,14 @@ public interface BasketballRecordMapper {
             FROM BASKETBALL_RECORDS
             WHERE ID=#{id}""")
     BasketballRecord findById(Long id);
+
+    @Select("""
+            SELECT SUM(B.POINTS) AS TOTAL_POINTS
+            FROM BASKETBALL_RECORDS B
+            JOIN GAME_RECORDS G
+              ON B.ID = G.ID
+            WHERE G.GAME_ID = #{gameId}
+              AND G.CLUB_ID = #{clubId}""")
+    int sumPoints(Long gameId, Long clubId);
 
 }

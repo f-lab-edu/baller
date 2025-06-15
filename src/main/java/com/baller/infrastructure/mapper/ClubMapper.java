@@ -27,4 +27,7 @@ public interface ClubMapper {
     @Select("SELECT EXISTS (SELECT 1 FROM CLUBS WHERE ID = #{id})")
     boolean existsByClubId(Long id);
 
+    @Select("SELECT NAME FROM CLUBS WHERE ID = #{id}")
+    String findNameById(Long id);
+
 }
