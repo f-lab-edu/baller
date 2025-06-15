@@ -39,7 +39,8 @@ public class SecurityConfig {
             "/actuator/prometheus",
             "/api/games",
             "/api/games/*",
-            "/api/games/*/records"
+            "/api/games/*/records",
+            "/game-record.html"
     };
 
     @Bean

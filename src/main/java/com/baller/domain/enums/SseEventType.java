@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum GameStatusType {
-    SCHEDULED("진행 예정"),
-    IN_PROGRESS("진행 중"),
-    ENDED("종료");
+public enum SseEventType {
+
+    INIT("connected"),
+    GAME_UPDATE("");
 
     private final String value;
+
 }

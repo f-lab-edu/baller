@@ -1,6 +1,5 @@
 package com.baller.application.service;
 
-import com.baller.application.dto.UpdateLiveBasketballRecord;
 import com.baller.common.annotation.RequireClubRole;
 import com.baller.common.exception.ClubNotFoundException;
 import com.baller.domain.enums.ClubRoleType;
@@ -11,10 +10,7 @@ import com.baller.domain.model.Game;
 import com.baller.domain.model.GameRecord;
 import com.baller.domain.model.Participation;
 import com.baller.infrastructure.mapper.*;
-import com.baller.presentation.dto.request.game.CreateGameRequest;
-import com.baller.presentation.dto.request.game.ParticipationRequest;
-import com.baller.presentation.dto.request.game.StartGameRequest;
-import com.baller.presentation.dto.request.game.UpdateBasketballRecordRequest;
+import com.baller.presentation.dto.request.game.*;
 import com.baller.presentation.dto.response.geme.GameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -103,13 +99,21 @@ public class GameService {
 
         basketballRecordMapper.updateBasketballRecord(BasketballRecord.of(gameRecordId, request));
 
-        gameRecordService.updateLiveRecord(gameId, UpdateLiveBasketballRecord.from(memberId, request));
+        gameRecordService.updateLiveRecord(gameId, getGame(gameId));
 
     }
 
-    public GameResponse getGame(Long gameId){
+    public GameRecordResponse getGame(Long gameId){
         Game game = gameMapper.findById(gameId);
-        return GameResponse.from(game);
+
+        String hostClubName  = clubMapper.findNameById(game.getHostClubId());
+        String guestClubName = clubMapper.findNameById(game.getGuestClubId());
+
+        int hostTotalScore = basketballRecordMapper.sumPoints(gameId, game.getHostClubId());
+        int guestTotalScore = basketballRecordMapper.sumPoints(gameId, game.getGuestClubId());
+
+        return GameRecordResponse.of(hostClubName, guestClubName, hostTotalScore, guestTotalScore, game.getStartTime(), game.getStatus().getValue());
+
     }
 
 }

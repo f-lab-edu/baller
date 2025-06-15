@@ -2,6 +2,7 @@ package com.baller.presentation.controller;
 
 import com.baller.application.service.GameService;
 import com.baller.presentation.dto.request.game.CreateGameRequest;
+import com.baller.presentation.dto.request.game.GameRecordResponse;
 import com.baller.presentation.dto.request.game.StartGameRequest;
 import com.baller.presentation.dto.request.game.UpdateBasketballRecordRequest;
 import com.baller.presentation.dto.response.geme.GameResponse;
@@ -43,7 +44,7 @@ public class GameController {
     }
 
     @GetMapping("/{gameId}")
-    public ResponseEntity<GameResponse> getGame(@PathVariable Long gameId) {
+    public ResponseEntity<GameRecordResponse> getGame(@PathVariable Long gameId) {
         return ResponseEntity.ok(gameService.getGame(gameId));
     }
 
