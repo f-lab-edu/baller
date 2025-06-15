@@ -1,5 +1,6 @@
 package com.baller.application.service;
 
+import com.baller.application.dto.UpdateLiveBasketballRecord;
 import com.baller.common.annotation.RequireClubRole;
 import com.baller.common.exception.ClubNotFoundException;
 import com.baller.domain.enums.ClubRoleType;
@@ -31,6 +32,7 @@ public class GameService {
     private final ParticipationMapper participationMapper;
     private final GameRecordMapper gameRecordMapper;
     private final BasketballRecordMapper basketballRecordMapper;
+    private final GameRecordService gameRecordService;
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER, ClubRoleType.MANAGER})
@@ -101,6 +103,13 @@ public class GameService {
 
         basketballRecordMapper.updateBasketballRecord(BasketballRecord.of(gameRecordId, request));
 
+        gameRecordService.updateLiveRecord(gameId, UpdateLiveBasketballRecord.from(memberId, request));
+
+    }
+
+    public GameResponse getGame(Long gameId){
+        Game game = gameMapper.findById(gameId);
+        return GameResponse.from(game);
     }
 
 }
