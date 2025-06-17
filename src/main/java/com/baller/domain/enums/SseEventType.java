@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SseEventType {
 
-    INIT("connected"),
-    GAME_UPDATE("");
-
-    private final String value;
+    INIT,
+    GAME_UPDATE
 
 }

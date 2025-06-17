@@ -24,7 +24,7 @@ public class SseEmitterManager {
         emitter.onError((e) -> emitters.get(channelKey).remove(emitter));
 
         try {
-            emitter.send(SseEmitter.event().name(String.valueOf(SseEventType.INIT)).data(SseEventType.INIT.getValue()));
+            emitter.send(SseEmitter.event().name(String.valueOf(SseEventType.INIT)).data(true));
         } catch (Exception e) {
             emitter.completeWithError(e);
         }
@@ -32,13 +32,13 @@ public class SseEmitterManager {
         return emitter;
     }
 
-    public void updateLiveRecord(String channelKey, Object data) {
+    public void broadcast(String channelKey, Object data, SseEventType sseEventType) {
 
         List<SseEmitter> gameEmitters = emitters.getOrDefault(channelKey, List.of());
 
         for(SseEmitter emitter : gameEmitters) {
             try {
-                emitter.send(SseEmitter.event().name(String.valueOf(SseEventType.GAME_UPDATE)).data(data));
+                emitter.send(SseEmitter.event().name(String.valueOf(sseEventType)).data(data));
             } catch (Exception e) {
                 emitter.completeWithError(e);
             }
