@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>실시간 경기 점수 - SPA</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1c4791; color: white; text-align: center; padding: 40px; }
+        .score-box { font-size: 36px; font-weight: bold; margin-bottom: 10px; }
+        .team-name { margin: 0 20px; min-width: 120px; display: inline-block; }
+        .status { background: #3c4f78; padding: 5px 14px; border-radius: 10px; font-size: 14px; display: inline-block; margin-bottom: 6px; }
+        .start-time { font-size: 14px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+<h1>실시간 경기 점수</h1>
+
+<div class="score-box">
+    <span class="team-name" id="teamA">-</span>
+    <span id="hostTotalScore">0</span> : <span id="guestTotalScore">0</span>
+    <span class="team-name" id="teamB">-</span>
+</div>
+
+<div class="status" id="status">-</div>
+<div class="start-time" id="startTime">-</div>
+
+<script>
+    const gameId = 3;
+
+    axios.get(`/api/games/${gameId}`)
+        .then(res => {
+            const data = res.data;
+            document.getElementById("teamA").innerText = data.hostClubName;
+            document.getElementById("teamB").innerText = data.guestClubName;
+            document.getElementById("hostTotalScore").innerText = data.hostTotalScore;
+            document.getElementById("guestTotalScore").innerText = data.guestTotalScore;
+            document.getElementById("status").innerText = data.status;
+            document.getElementById("startTime").innerText = data.startTime;
+        });
+
+    const eventSource = new EventSource(`/api/games/${gameId}/records`);
+    eventSource.addEventListener("GAME_UPDATE", function(e) {
+        const data = JSON.parse(e.data);
+        console.log("data : %o", data)
+
+        const hostScoreEl = document.getElementById("hostTotalScore");
+        const guestScoreEl = document.getElementById("guestTotalScore");
+
+        hostScoreEl.innerText = data.hostTotalScore;
+        guestScoreEl.innerText = data.guestTotalScore;
+    });
+
+    eventSource.onerror = () => {
+        console.warn("SSE 연결 종료");
+        eventSource.close();
+    };
+</script>
+</body>
+</html>
