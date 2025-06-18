@@ -37,7 +37,10 @@ public class SecurityConfig {
             "/api/clubs",
             "/api/clubs/*",
             "/actuator/prometheus",
-            "/api/games"
+            "/api/games",
+            "/api/games/*",
+            "/api/games/*/records",
+            "/game-record.html"
     };
 
     @Bean
