@@ -14,9 +14,9 @@
 ---------------
 
 ## 사용 기술
-- Java17
-- Spring Boot 3.4.4, Spring MVC, Spring Security
-- MyBatis
-- Postgresql
-- JWT
-- Git
+- Language : Java 17
+- Framework : Spring Boot, Spring Security
+- DB : Postgresql, MyBatis
+- Others : JWT, WebSocket, STOMP, MultipartFile
+- Containerization: Docker
+- Monitoring : Prometheus + Grafana
