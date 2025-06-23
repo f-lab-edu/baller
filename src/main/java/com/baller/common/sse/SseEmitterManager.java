@@ -49,6 +49,7 @@ public class SseEmitterManager {
                 emitter.send(SseEmitter.event().name(String.valueOf(sseEventType)).data(data));
             } catch (Exception e) {
                 emitter.completeWithError(e);
+                removeEmitter(channelKey, emitter);
             }
         }
 
