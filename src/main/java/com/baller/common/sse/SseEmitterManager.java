@@ -2,6 +2,7 @@ package com.baller.common.sse;
 
 import com.baller.domain.enums.SseEventType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -14,11 +15,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class SseEmitterManager {
 
+    @Value("${sse.emitter.timeout}")
+    private Long emitterTimeout;
+
     private final Map<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter subscribe(String channelKey) {
 
-        SseEmitter emitter = new SseEmitter(60000L);
+        SseEmitter emitter = new SseEmitter(emitterTimeout);
         emitters.computeIfAbsent(channelKey, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
         emitter.onCompletion(() -> removeEmitter(channelKey, emitter));
