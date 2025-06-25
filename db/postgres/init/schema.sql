@@ -40,3 +40,47 @@ CREATE TABLE club_apply_requests (
                                             handled_by int8 NULL,
                                             CONSTRAINT club_join_applys_pkey PRIMARY KEY (id)
 );
+
+CREATE TABLE games (
+                              id bigserial NOT NULL,
+                              title varchar(255) NULL,
+                              start_time timestamp NULL,
+                              end_time timestamp NULL,
+                              host_club_id int8 NULL,
+                              guest_club_id int8 NULL,
+                              host_score int4 NULL,
+                              guest_score int4 NULL,
+                              status varchar(50) NULL,
+                              sport_type varchar(100) NULL,
+                              CONSTRAINT games_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE participations (
+                                       id bigserial NOT NULL,
+                                       member_id int8 NOT NULL,
+                                       game_id int8 NOT NULL,
+                                       club_id int8 NOT NULL,
+                                       CONSTRAINT participations_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE game_records (
+                                     id bigserial NOT NULL,
+                                     game_id int8 NOT NULL,
+                                     member_id int8 NOT NULL,
+                                     club_id int8 NOT NULL,
+                                     created_at timestamp NULL,
+                                     updated_at timestamp NULL,
+                                     CONSTRAINT game_records_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE basketball_records (
+                                           id int8 NOT NULL,
+                                           points int4 NULL DEFAULT 0,
+                                           assists int4 NULL DEFAULT 0,
+                                           rebounds int4 NULL DEFAULT 0,
+                                           steals int4 NULL DEFAULT 0,
+                                           blocks int4 NULL DEFAULT 0,
+                                           play_time int4 NULL DEFAULT 0,
+                                           fouls int4 NULL DEFAULT 0,
+                                           CONSTRAINT basketball_records_pkey PRIMARY KEY (id)
+);

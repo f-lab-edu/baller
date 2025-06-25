@@ -15,3 +15,6 @@ management:
     web:
       exposure:
         include: prometheus
+sse:
+  emitter:
+    timeout: 60000
