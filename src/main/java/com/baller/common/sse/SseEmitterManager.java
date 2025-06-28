@@ -18,6 +18,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @EnableScheduling
 public class SseEmitterManager {
 
+    private static final long CLEANUP_INTERVAL_MS = 1000 * 30;
+    private static final long EMITTER_TTL_MS      = 1000 * 90;
+    private static final long LOG_INTERVAL_MS     = 1000 * 10;
+
     @Value("${sse.emitter.timeout}")
     private Long emitterTimeout;
 
@@ -78,12 +82,10 @@ public class SseEmitterManager {
         }
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = CLEANUP_INTERVAL_MS)
     public void cleanUpEmitters() {
 
         log.info("Emitter CleanUp");
-
-        long expirationThreshold = 90000;
 
         for (Map.Entry<String, List<SseEmitterWrapper>> entry : emitters.entrySet()) {
             String channelKey = entry.getKey();
@@ -91,11 +93,10 @@ public class SseEmitterManager {
 
             wrapperList.removeIf(wrapper -> {
                 SseEmitter emitter = wrapper.getEmitter();
-                boolean expired = wrapper.isExpired(expirationThreshold);
+                boolean expired = wrapper.isExpired(EMITTER_TTL_MS);
                 if (expired) {
                     try {
                         emitter.complete();
-                        removeEmitter(channelKey, wrapper);
                         log.info("만료된 emitter 제거: {}", channelKey);
                     } catch (Exception e) {
                         log.warn("만료된 emitter 종료 중 예외 발생", e);
@@ -106,7 +107,7 @@ public class SseEmitterManager {
         }
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = LOG_INTERVAL_MS)
     public void logActiveEmitterCount() {
         int count = countActiveEmitters();
         log.info("현재 SSE 커넥션 수: {}", count);
