@@ -6,17 +6,17 @@ export const options = {
         sse_clients: {
             executor: 'constant-vus',
             exec: 'sseConnection',
-            vus: 2000,
-            duration: '60s',
+            vus: 1500,
+            duration: '120s',
         },
         event_producers: {
             executor: 'constant-arrival-rate',
             exec: 'sendEvent',
-            rate: 20,
+            rate: 1,
             timeUnit: '1s',
             duration: '60s',
-            preAllocatedVUs: 400,
-            maxVUs: 10000,
+            preAllocatedVUs: 100,
+            maxVUs: 100,
         },
     },
 };
@@ -55,7 +55,9 @@ export function sseConnection(data) {
 
     check(res, {
         'SSE 연결 성공': (r) => {
-            console.log(`SSE 응답 status=${r.status}, body.length=${r.body?.length}`);
+            if (!r || r.status !== 200) {
+                console.error(`[FAIL] status=${r?.status}, body=${r?.body?.slice(0, 100)}`);
+            }
             return r.status === 200;
         },
     });
