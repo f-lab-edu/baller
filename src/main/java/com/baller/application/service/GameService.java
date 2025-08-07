@@ -1,5 +1,6 @@
 package com.baller.application.service;
 
+import com.baller.application.dto.GameUpdatedEvent;
 import com.baller.common.annotation.RequireClubRole;
 import com.baller.common.exception.ClubNotFoundException;
 import com.baller.domain.enums.ClubRoleType;
@@ -13,6 +14,7 @@ import com.baller.infrastructure.mapper.*;
 import com.baller.presentation.dto.request.game.*;
 import com.baller.presentation.dto.response.geme.GameResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,7 @@ public class GameService {
     private final ParticipationMapper participationMapper;
     private final GameRecordMapper gameRecordMapper;
     private final BasketballRecordMapper basketballRecordMapper;
-    private final GameRecordService gameRecordService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     @RequireClubRole({ClubRoleType.LEADER, ClubRoleType.MANAGER})
@@ -99,7 +101,7 @@ public class GameService {
 
         basketballRecordMapper.updateBasketballRecord(BasketballRecord.of(gameRecordId, request));
 
-        gameRecordService.updateLiveRecord(gameId, getGame(gameId));
+        applicationEventPublisher.publishEvent(new GameUpdatedEvent(gameId, memberId));
 
     }
 

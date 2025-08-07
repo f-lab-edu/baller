@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/api/games",
             "/api/games/*",
             "/api/games/*/records",
+            "/api/games/*/records/polling",
             "/game-record.html"
     };
 
