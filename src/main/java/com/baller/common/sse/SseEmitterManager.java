@@ -8,10 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
@@ -25,13 +24,13 @@ public class SseEmitterManager {
     @Value("${sse.emitter.timeout}")
     private Long emitterTimeout;
 
-    private final Map<String, List<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
+    private final Map<String, Set<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter subscribe(String channelKey) {
 
         SseEmitter emitter = new SseEmitter(emitterTimeout);
         SseEmitterWrapper emitterWrapper = new SseEmitterWrapper(emitter);
-        emitters.computeIfAbsent(channelKey, k -> new CopyOnWriteArrayList<>()).add(emitterWrapper);
+        emitters.computeIfAbsent(channelKey, k -> ConcurrentHashMap.newKeySet()).add(emitterWrapper);
 
         emitter.onCompletion(() -> removeEmitter(channelKey, emitterWrapper));
         emitter.onTimeout(() -> {
@@ -54,7 +53,8 @@ public class SseEmitterManager {
 
     public void broadcast(String channelKey, Object data, SseEventType sseEventType) {
 
-        List<SseEmitterWrapper> gameEmitters = emitters.getOrDefault(channelKey, List.of());
+        Set<SseEmitterWrapper> gameEmitters = emitters.get(channelKey);
+        if (gameEmitters == null || gameEmitters.isEmpty()) return;
 
         for(SseEmitterWrapper emitterWrapper : gameEmitters) {
             SseEmitter emitter = emitterWrapper.getEmitter();
@@ -69,7 +69,7 @@ public class SseEmitterManager {
     }
 
     private void removeEmitter(String channelKey, SseEmitterWrapper emitterWrapper) {
-        List<SseEmitterWrapper> list = emitters.get(channelKey);
+        Set<SseEmitterWrapper> list = emitters.get(channelKey);
 
         if (list != null) {
             list.remove(emitterWrapper);
@@ -87,9 +87,9 @@ public class SseEmitterManager {
 
         log.info("Emitter CleanUp");
 
-        for (Map.Entry<String, List<SseEmitterWrapper>> entry : emitters.entrySet()) {
+        for (Map.Entry<String, Set<SseEmitterWrapper>> entry : emitters.entrySet()) {
             String channelKey = entry.getKey();
-            List<SseEmitterWrapper> wrapperList = entry.getValue();
+            Set<SseEmitterWrapper> wrapperList = entry.getValue();
 
             wrapperList.removeIf(wrapper -> {
                 SseEmitter emitter = wrapper.getEmitter();
@@ -115,7 +115,7 @@ public class SseEmitterManager {
 
     public int countActiveEmitters() {
         return emitters.values().stream()
-                .mapToInt(List::size)
+                .mapToInt(Set::size)
                 .sum();
     }
 
