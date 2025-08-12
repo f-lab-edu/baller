@@ -1,6 +1,8 @@
 package com.baller.common.sse;
 
 import com.baller.domain.enums.SseEventType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -23,6 +25,8 @@ public class SseEmitterManager {
 
     @Value("${sse.emitter.timeout}")
     private Long emitterTimeout;
+
+    private final ObjectMapper om = new ObjectMapper();
 
     private final Map<String, Set<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
 
@@ -56,16 +60,27 @@ public class SseEmitterManager {
         Set<SseEmitterWrapper> gameEmitters = emitters.get(channelKey);
         if (gameEmitters == null || gameEmitters.isEmpty()) return;
 
+        //한번만 직렬화해서 재사용
+        final String json = toJson(data);
+
         for(SseEmitterWrapper emitterWrapper : gameEmitters) {
             SseEmitter emitter = emitterWrapper.getEmitter();
             try {
-                emitter.send(SseEmitter.event().name(String.valueOf(sseEventType)).data(data));
+                emitter.send(SseEmitter.event().name(String.valueOf(sseEventType)).data(json));
             } catch (Exception e) {
                 emitter.completeWithError(e);
                 removeEmitter(channelKey, emitterWrapper);
             }
         }
 
+    }
+
+    private String toJson(Object data) {
+        try {
+            return (data instanceof String s) ? s : om.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("SSE 직렬화 실패", e);
+        }
     }
 
     private void removeEmitter(String channelKey, SseEmitterWrapper emitterWrapper) {
