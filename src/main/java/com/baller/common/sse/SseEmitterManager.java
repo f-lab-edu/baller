@@ -10,9 +10,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 @Slf4j
 @Component
@@ -29,6 +30,17 @@ public class SseEmitterManager {
     private final ObjectMapper om = new ObjectMapper();
 
     private final Map<String, Set<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
+
+    // 전용 브로드캐스트 풀
+    private final ExecutorService broadcastPool =
+            new ThreadPoolExecutor(
+                    2,
+                    4,
+                    30, TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<>(500),
+                    r -> { Thread t = new Thread(r, "sse-broadcast"); t.setDaemon(true); return t; },
+                    new ThreadPoolExecutor.CallerRunsPolicy()
+            );
 
     public SseEmitter subscribe(String channelKey) {
 
@@ -63,16 +75,23 @@ public class SseEmitterManager {
         //한번만 직렬화해서 재사용
         final String json = toJson(data);
 
-        for(SseEmitterWrapper emitterWrapper : gameEmitters) {
-            SseEmitter emitter = emitterWrapper.getEmitter();
-            try {
-                emitter.send(SseEmitter.event().name(String.valueOf(sseEventType)).data(json));
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-                removeEmitter(channelKey, emitterWrapper);
-            }
+        //스냅샷 떠서 안정적 반복
+        List<SseEmitterWrapper> snapshot = List.copyOf(gameEmitters);
+
+        for (SseEmitterWrapper emitterWrapper : snapshot) {
+            broadcastPool.submit(() -> sendOne(channelKey, emitterWrapper, sseEventType, json));
         }
 
+    }
+
+    private void sendOne(String channelKey, SseEmitterWrapper emitterWrapper, SseEventType type, String json) {
+        SseEmitter emitter = emitterWrapper.getEmitter();
+        try {
+            emitter.send(SseEmitter.event().name(type.name()).data(json));
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+            removeEmitter(channelKey, emitterWrapper);
+        }
     }
 
     private String toJson(Object data) {
