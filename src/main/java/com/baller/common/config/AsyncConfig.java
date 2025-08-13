@@ -13,7 +13,7 @@ public class AsyncConfig {
 
     @Bean("sseListenerPool")
     public Executor sseListenerPool() {
-        return Executors.newFixedThreadPool(4, r -> {
+        return Executors.newFixedThreadPool(2, r -> {
             Thread t = new Thread(r, "sse-listener");
             t.setDaemon(true);
             return t;

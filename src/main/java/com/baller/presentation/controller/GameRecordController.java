@@ -14,14 +14,16 @@ public class GameRecordController {
 
     private final GameRecordService gameRecordService;
 
-    @GetMapping("/{gameId}/records")
-    public ResponseEntity<SseEmitter> subscribe(@PathVariable Long gameId) {
-        return ResponseEntity.ok(gameRecordService.subscribe(gameId));
-    }
-
+    //Polling
     @GetMapping("/{gameId}/records/polling")
     public ResponseEntity<GameRecordResponse> pollGameRecord(@PathVariable Long gameId) {
         return ResponseEntity.ok(gameRecordService.getCurrentRecord(gameId));
+    }
+
+    //SSE
+    @GetMapping("/{gameId}/records")
+    public ResponseEntity<SseEmitter> subscribe(@PathVariable Long gameId) {
+        return ResponseEntity.ok(gameRecordService.subscribe(gameId));
     }
 
 }
