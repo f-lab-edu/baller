@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class SseEmitterManager {
                     2,
                     4,
                     30, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<>(500),
+                    new LinkedBlockingQueue<>(200),
                     r -> { Thread t = new Thread(r, "sse-broadcast"); t.setDaemon(true); return t; },
                     new ThreadPoolExecutor.CallerRunsPolicy()
             );
@@ -75,11 +76,15 @@ public class SseEmitterManager {
         //한번만 직렬화해서 재사용
         final String json = toJson(data);
 
-        //스냅샷 떠서 안정적 반복
-        List<SseEmitterWrapper> snapshot = List.copyOf(gameEmitters);
-
-        for (SseEmitterWrapper emitterWrapper : snapshot) {
-            broadcastPool.submit(() -> sendOne(channelKey, emitterWrapper, sseEventType, json));
+        var it = gameEmitters.iterator();
+        while (it.hasNext()) {
+            List<SseEmitterWrapper> batch = new ArrayList<>(64);
+            for (int i=0; i<64 && it.hasNext(); i++) {
+                batch.add(it.next());
+            }
+            broadcastPool.submit(() -> {
+                for (var w : batch) sendOne(channelKey, w, sseEventType, json);
+            });
         }
 
     }
