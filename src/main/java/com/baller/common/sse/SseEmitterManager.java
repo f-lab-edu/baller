@@ -3,8 +3,6 @@ package com.baller.common.sse;
 import com.baller.domain.enums.SseEventType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -45,16 +43,6 @@ public class SseEmitterManager {
                     new ThreadPoolExecutor.CallerRunsPolicy()
             );
 
-    private final Timer broadcastTimer;
-
-    public SseEmitterManager(MeterRegistry registry) {
-        this.broadcastTimer = Timer.builder("sse.broadcast.time")
-                .publishPercentileHistogram() // 히스토그램 버킷 노출
-                .publishPercentiles(0.95, 0.99) // (선택) p95/p99 gauge도 함께 노출
-                .description("Time to complete one broadcast to all emitters")
-                .register(registry);
-    }
-
     public SseEmitter subscribe(String channelKey) {
 
         SseEmitter emitter = new SseEmitter(emitterTimeout);
@@ -82,31 +70,23 @@ public class SseEmitterManager {
 
     public void broadcast(String channelKey, Object data, SseEventType sseEventType) {
 
-        broadcastTimer.record(() -> {
+        Set<SseEmitterWrapper> gameEmitters = emitters.get(channelKey);
+        if (gameEmitters == null || gameEmitters.isEmpty()) return;
 
-            Set<SseEmitterWrapper> gameEmitters = emitters.get(channelKey);
-            if (gameEmitters == null || gameEmitters.isEmpty()) return;
+        //한번만 직렬화해서 재사용
+        final String json = toJson(data);
 
-            //한번만 직렬화해서 재사용
-            final String json = toJson(data);
-            List<Future<?>> futures = new ArrayList<>();
-
-            var it = gameEmitters.iterator();
-            while (it.hasNext()) {
-                List<SseEmitterWrapper> batch = new ArrayList<>(64);
-                for (int i=0; i<64 && it.hasNext(); i++) {
-                    batch.add(it.next());
-                }
-                futures.add(broadcastPool.submit(() -> {
-                    for (var w : batch) sendOne(channelKey, w, sseEventType, json);
-                }));
+        var it = gameEmitters.iterator();
+        while (it.hasNext()) {
+            //64개씩 묶어 병렬 전송
+            List<SseEmitterWrapper> batch = new ArrayList<>(64);
+            for (int i=0; i<64 && it.hasNext(); i++) {
+                batch.add(it.next());
             }
-            // ✅ 모든 배치가 끝날 때까지 대기 → "방송 완료" 시간 기록
-            for (Future<?> f : futures) {
-                try { f.get(); } catch (Exception ignore) {}
-            }
-
-        });
+            broadcastPool.submit(() -> {
+                for (var w : batch) sendOne(channelKey, w, sseEventType, json);
+            });
+        }
 
     }
 
