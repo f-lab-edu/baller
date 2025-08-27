@@ -1,5 +1,6 @@
 package com.baller.presentation;
 
+import com.baller.application.dto.GameUpdatedEvent;
 import com.baller.application.service.GameRecordService;
 import com.baller.domain.enums.GameStatusType;
 import com.baller.presentation.dto.request.game.GameRecordResponse;
@@ -12,10 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -72,13 +70,13 @@ public class GameRecordControllerTest {
 
         Thread.sleep(300); // 연결 대기
 
-        gameRecordService.updateLiveRecord(999L, GameRecordResponse.of(
+        gameRecordService.gameRecordUpdate(new GameUpdatedEvent(999L, GameRecordResponse.of(
                 "테스트 동아리1",
                 "테스트 동아리2",
                 58,
                 61,
                 LocalDateTime.of(2025, 6, 15, 19, 30),
-                GameStatusType.IN_PROGRESS.getValue()));
+                GameStatusType.IN_PROGRESS.getValue())));
 
         Awaitility.await().atMost(2, TimeUnit.SECONDS)
                 .until(() -> received.stream().anyMatch(s -> s.contains("테스트 동아리")));

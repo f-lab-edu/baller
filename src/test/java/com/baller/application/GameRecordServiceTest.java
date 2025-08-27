@@ -1,5 +1,6 @@
 package com.baller.application;
 
+import com.baller.application.dto.GameUpdatedEvent;
 import com.baller.application.service.GameRecordService;
 import com.baller.common.sse.SseEmitterManager;
 import com.baller.domain.enums.GameStatusType;
@@ -60,7 +61,7 @@ public class GameRecordServiceTest {
         );
 
         // when
-        gameRecordService.updateLiveRecord(gameId, dummyData);
+        gameRecordService.gameRecordUpdate(new GameUpdatedEvent(gameId, dummyData));
 
         // then
         verify(sseEmitterManager).broadcast(SseChannelKeyType.GAME_RECORD.of(gameId), dummyData, SseEventType.GAME_UPDATE);

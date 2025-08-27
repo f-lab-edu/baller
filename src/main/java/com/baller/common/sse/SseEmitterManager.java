@@ -1,6 +1,8 @@
 package com.baller.common.sse;
 
 import com.baller.domain.enums.SseEventType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -8,10 +10,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.*;
 
 @Slf4j
 @Component
@@ -25,13 +28,26 @@ public class SseEmitterManager {
     @Value("${sse.emitter.timeout}")
     private Long emitterTimeout;
 
-    private final Map<String, List<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
+    private final ObjectMapper om = new ObjectMapper();
+
+    private final Map<String, Set<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
+
+    // 전용 브로드캐스트 풀
+    private final ExecutorService broadcastPool =
+            new ThreadPoolExecutor(
+                    2,
+                    4,
+                    30, TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<>(200),
+                    r -> { Thread t = new Thread(r, "sse-broadcast"); t.setDaemon(true); return t; },
+                    new ThreadPoolExecutor.CallerRunsPolicy()
+            );
 
     public SseEmitter subscribe(String channelKey) {
 
         SseEmitter emitter = new SseEmitter(emitterTimeout);
         SseEmitterWrapper emitterWrapper = new SseEmitterWrapper(emitter);
-        emitters.computeIfAbsent(channelKey, k -> new CopyOnWriteArrayList<>()).add(emitterWrapper);
+        emitters.computeIfAbsent(channelKey, k -> ConcurrentHashMap.newKeySet()).add(emitterWrapper);
 
         emitter.onCompletion(() -> removeEmitter(channelKey, emitterWrapper));
         emitter.onTimeout(() -> {
@@ -54,22 +70,46 @@ public class SseEmitterManager {
 
     public void broadcast(String channelKey, Object data, SseEventType sseEventType) {
 
-        List<SseEmitterWrapper> gameEmitters = emitters.getOrDefault(channelKey, List.of());
+        Set<SseEmitterWrapper> gameEmitters = emitters.get(channelKey);
+        if (gameEmitters == null || gameEmitters.isEmpty()) return;
 
-        for(SseEmitterWrapper emitterWrapper : gameEmitters) {
-            SseEmitter emitter = emitterWrapper.getEmitter();
-            try {
-                emitter.send(SseEmitter.event().name(String.valueOf(sseEventType)).data(data));
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-                removeEmitter(channelKey, emitterWrapper);
+        //한번만 직렬화해서 재사용
+        final String json = toJson(data);
+
+        var it = gameEmitters.iterator();
+        while (it.hasNext()) {
+            //64개씩 묶어 병렬 전송
+            List<SseEmitterWrapper> batch = new ArrayList<>(64);
+            for (int i=0; i<64 && it.hasNext(); i++) {
+                batch.add(it.next());
             }
+            broadcastPool.submit(() -> {
+                for (var w : batch) sendOne(channelKey, w, sseEventType, json);
+            });
         }
 
     }
 
+    private void sendOne(String channelKey, SseEmitterWrapper emitterWrapper, SseEventType type, String json) {
+        SseEmitter emitter = emitterWrapper.getEmitter();
+        try {
+            emitter.send(SseEmitter.event().name(type.name()).data(json));
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+            removeEmitter(channelKey, emitterWrapper);
+        }
+    }
+
+    private String toJson(Object data) {
+        try {
+            return (data instanceof String s) ? s : om.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("SSE 직렬화 실패", e);
+        }
+    }
+
     private void removeEmitter(String channelKey, SseEmitterWrapper emitterWrapper) {
-        List<SseEmitterWrapper> list = emitters.get(channelKey);
+        Set<SseEmitterWrapper> list = emitters.get(channelKey);
 
         if (list != null) {
             list.remove(emitterWrapper);
@@ -87,9 +127,9 @@ public class SseEmitterManager {
 
         log.info("Emitter CleanUp");
 
-        for (Map.Entry<String, List<SseEmitterWrapper>> entry : emitters.entrySet()) {
+        for (Map.Entry<String, Set<SseEmitterWrapper>> entry : emitters.entrySet()) {
             String channelKey = entry.getKey();
-            List<SseEmitterWrapper> wrapperList = entry.getValue();
+            Set<SseEmitterWrapper> wrapperList = entry.getValue();
 
             wrapperList.removeIf(wrapper -> {
                 SseEmitter emitter = wrapper.getEmitter();
@@ -115,7 +155,7 @@ public class SseEmitterManager {
 
     public int countActiveEmitters() {
         return emitters.values().stream()
-                .mapToInt(List::size)
+                .mapToInt(Set::size)
                 .sum();
     }
 
