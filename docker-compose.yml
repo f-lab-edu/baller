@@ -1,6 +1,5 @@
 services:
   spring:
-    container_name: spring
     deploy:
       resources:
         limits:
@@ -12,10 +11,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       - postgres
+  nginx:
+    image: nginx:1.25-alpine
+    depends_on:
+      - spring
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.11.0
+    command: [ "-nginx.scrape-uri", "http://nginx/nginx_status" ]
+    depends_on:
+      - nginx
+    expose:
+      - "9113"
   postgres:
     image: postgres:15
     container_name: postgres
