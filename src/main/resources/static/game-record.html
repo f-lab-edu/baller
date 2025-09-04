@@ -27,28 +27,30 @@
 <script>
     const gameId = 3;
 
-    axios.get(`/api/games/${gameId}`)
-        .then(res => {
-            const data = res.data;
-            document.getElementById("teamA").innerText = data.hostClubName;
-            document.getElementById("teamB").innerText = data.guestClubName;
-            document.getElementById("hostTotalScore").innerText = data.hostTotalScore;
-            document.getElementById("guestTotalScore").innerText = data.guestTotalScore;
-            document.getElementById("status").innerText = data.status;
-            document.getElementById("startTime").innerText = data.startTime;
-        });
-
     const eventSource = new EventSource(`/api/games/${gameId}/records`);
+
+    // 구독 직후 SNAPSHOT 1회로 초기 화면 세팅
+    eventSource.addEventListener("SNAPSHOT", function(e) {
+        const data = JSON.parse(e.data);
+        console.log("SNAPSHOT:", data);
+        render(data);
+    });
+
+    // 이후 점수 업데이트 이벤트
     eventSource.addEventListener("GAME_UPDATE", function(e) {
         const data = JSON.parse(e.data);
-        console.log("data : %o", data)
-
-        const hostScoreEl = document.getElementById("hostTotalScore");
-        const guestScoreEl = document.getElementById("guestTotalScore");
-
-        hostScoreEl.innerText = data.hostTotalScore;
-        guestScoreEl.innerText = data.guestTotalScore;
+        console.log("GAME_UPDATE:", data);
+        render(data);
     });
+
+    function render(data) {
+        document.getElementById("teamA").innerText = data.hostClubName;
+        document.getElementById("teamB").innerText = data.guestClubName;
+        document.getElementById("hostTotalScore").innerText = data.hostTotalScore;
+        document.getElementById("guestTotalScore").innerText = data.guestTotalScore;
+        document.getElementById("status").innerText = data.status;
+        document.getElementById("startTime").innerText = data.startTime ?? "-";
+    }
 
     eventSource.onerror = () => {
         console.warn("SSE 연결 종료");

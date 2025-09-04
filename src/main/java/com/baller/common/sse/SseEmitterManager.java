@@ -3,6 +3,7 @@ package com.baller.common.sse;
 import com.baller.domain.enums.SseEventType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -19,6 +20,7 @@ import java.util.concurrent.*;
 @Slf4j
 @Component
 @EnableScheduling
+@RequiredArgsConstructor
 public class SseEmitterManager {
 
     private static final long CLEANUP_INTERVAL_MS = 1000 * 30;
@@ -28,8 +30,7 @@ public class SseEmitterManager {
     @Value("${sse.emitter.timeout}")
     private Long emitterTimeout;
 
-    private final ObjectMapper om = new ObjectMapper();
-
+    private final ObjectMapper objectMapper;
     private final Map<String, Set<SseEmitterWrapper>> emitters = new ConcurrentHashMap<>();
 
     // 전용 브로드캐스트 풀
@@ -42,6 +43,20 @@ public class SseEmitterManager {
                     r -> { Thread t = new Thread(r, "sse-broadcast"); t.setDaemon(true); return t; },
                     new ThreadPoolExecutor.CallerRunsPolicy()
             );
+
+    public void send(SseEmitter emitter, String eventName, String idOrNull, String json) {
+        try {
+            var evt = SseEmitter.event().name(eventName).data(json);
+            if (idOrNull != null) evt = evt.id(idOrNull);
+            emitter.send(evt);
+        } catch (Exception e) {
+            try {
+                emitter.completeWithError(e);
+            } catch (Exception ignore) {
+
+            }
+        }
+    }
 
     public SseEmitter subscribe(String channelKey) {
 
@@ -102,7 +117,7 @@ public class SseEmitterManager {
 
     private String toJson(Object data) {
         try {
-            return (data instanceof String s) ? s : om.writeValueAsString(data);
+            return (data instanceof String s) ? s : objectMapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("SSE 직렬화 실패", e);
         }

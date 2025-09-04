@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com'
-version = '0.0.1-SNAPSHOT'
+version = ''
 
 java {
     toolchain {
@@ -51,6 +51,9 @@ dependencies {
     implementation "io.micrometer:micrometer-registry-prometheus"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.apache.commons:commons-pool2'
 
 }
 
