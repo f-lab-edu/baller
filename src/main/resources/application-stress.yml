@@ -6,6 +6,10 @@ spring:
     driverClassName: org.postgresql.Driver
     username: user
     password: password
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
