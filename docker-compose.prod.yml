@@ -1,0 +1,31 @@
+name: baller-1box
+services:
+  nginx:
+    build: ./nginx           # (또는 image: mynginx:latest)
+    ports: ["80:80"]
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      baller-spring-1: { condition: service_healthy }
+      baller-spring-2: { condition: service_healthy }
+    restart: always
+
+  baller-spring-1:
+    image: myapp:latest      # EC2에서 빌드하거나 ECR 이미지 사용
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+    restart: always
+
+  baller-spring-2:
+    image: myapp:latest
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+    restart: always
