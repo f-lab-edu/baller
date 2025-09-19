@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile-prod
     image: myapp:prod            # 태깅해두면 좋음
     env_file: .env
-    cpus: "0.5"
+    cpus: "0.3"
     mem_limit: "400m"
     pull_policy: never           # 로컬 빌드 이미지 사용
     healthcheck:
@@ -36,7 +36,7 @@ services:
       dockerfile: Dockerfile-prod
     image: myapp:prod
     env_file: .env
-    cpus: "0.5"
+    cpus: "0.3"
     mem_limit: "400m"
     pull_policy: never
     healthcheck:
