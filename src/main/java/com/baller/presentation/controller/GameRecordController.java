@@ -26,9 +26,10 @@ public class GameRecordController {
 
     //SSE
     @GetMapping("/{gameId}/records")
-    public ResponseEntity<SseEmitter> subscribe(@PathVariable Long gameId) {
+    public ResponseEntity<SseEmitter> subscribe(@PathVariable Long gameId, 
+                                               @RequestParam(required = false) String connectionId) {
 
-        SseEmitter emitter = gameRecordService.subscribe(gameId);
+        SseEmitter emitter = gameRecordService.subscribe(gameId, connectionId);
 
         try {
             GameRecordResponse snapshot = gameRecordService.getCurrentRecord(gameId);

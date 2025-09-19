@@ -27,6 +27,10 @@ public class GameRecordService {
         return sseEmitterManager.subscribe(SseChannelKeyType.GAME_RECORD.of(gameId));
     }
 
+    public SseEmitter subscribe(Long gameId, String connectionId) {
+        return sseEmitterManager.subscribe(SseChannelKeyType.GAME_RECORD.of(gameId), connectionId);
+    }
+
     public void send(SseEmitter emitter, String eventName, String idOrNull, String json) {
         sseEmitterManager.send(emitter, eventName, idOrNull, json);
     }
