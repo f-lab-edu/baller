@@ -17,9 +17,6 @@ services:
     build:
       context: .                 # ← 현재 리포 루트
       dockerfile: Dockerfile-prod
-      # (선택) JAR 경로가 다르면 override 가능
-      # args:
-      #   JAR_FILE: build/libs/baller-0.0.1-SNAPSHOT.jar
     image: myapp:prod            # 태깅해두면 좋음
     env_file: .env
     pull_policy: never           # 로컬 빌드 이미지 사용
@@ -35,8 +32,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-prod
-      # args:
-      #   JAR_FILE: build/libs/baller-0.0.1-SNAPSHOT.jar
     image: myapp:prod
     env_file: .env
     pull_policy: never
