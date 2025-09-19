@@ -19,6 +19,8 @@ services:
       dockerfile: Dockerfile-prod
     image: myapp:prod            # 태깅해두면 좋음
     env_file: .env
+    cpus: "0.5"
+    mem_limit: "400m"
     pull_policy: never           # 로컬 빌드 이미지 사용
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
@@ -34,6 +36,8 @@ services:
       dockerfile: Dockerfile-prod
     image: myapp:prod
     env_file: .env
+    cpus: "0.5"
+    mem_limit: "400m"
     pull_policy: never
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
