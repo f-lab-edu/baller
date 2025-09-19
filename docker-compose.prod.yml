@@ -1,7 +1,7 @@
 name: baller-1box
 services:
   nginx:
-    build: ./nginx
+    image: nginx:1.25-alpine
     ports:
       - "80:80"
     volumes:
