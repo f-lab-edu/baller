@@ -37,6 +37,7 @@ public class SecurityConfig {
             "/api/clubs",
             "/api/clubs/*",
             "/actuator/prometheus",
+            "/actuator/health",
             "/api/games",
             "/api/games/*",
             "/api/games/*/records",
