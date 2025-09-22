@@ -17,6 +17,5 @@
 - Language : Java 17
 - Framework : Spring Boot, Spring Security
 - DB : Postgresql, MyBatis
-- Others : JWT, WebSocket, STOMP, MultipartFile
 - Containerization: Docker
 - Monitoring : Prometheus + Grafana
