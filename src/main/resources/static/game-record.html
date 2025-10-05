@@ -26,22 +26,67 @@
 
 <script>
     const gameId = 3;
+    let eventSource = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    const reconnectDelay = 3000; // 3초
+    let connectionId = null;
 
-    const eventSource = new EventSource(`/api/games/${gameId}/records`);
+    function generateConnectionId() {
+        return 'conn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
 
-    // 구독 직후 SNAPSHOT 1회로 초기 화면 세팅
-    eventSource.addEventListener("SNAPSHOT", function(e) {
-        const data = JSON.parse(e.data);
-        console.log("SNAPSHOT:", data);
-        render(data);
-    });
+    function connect() {
+        if (eventSource) {
+            eventSource.close();
+        }
 
-    // 이후 점수 업데이트 이벤트
-    eventSource.addEventListener("GAME_UPDATE", function(e) {
-        const data = JSON.parse(e.data);
-        console.log("GAME_UPDATE:", data);
-        render(data);
-    });
+        connectionId = generateConnectionId();
+        const url = `/api/games/${gameId}/records?connectionId=${connectionId}`;
+        eventSource = new EventSource(url);
+
+        // 구독 직후 SNAPSHOT 1회로 초기 화면 세팅
+        eventSource.addEventListener("SNAPSHOT", function(e) {
+            const data = JSON.parse(e.data);
+            console.log("SNAPSHOT:", data);
+            render(data);
+            reconnectAttempts = 0; // 연결 성공 시 재시도 횟수 리셋
+        });
+
+        // 이후 점수 업데이트 이벤트
+        eventSource.addEventListener("GAME_UPDATE", function(e) {
+            const data = JSON.parse(e.data);
+            console.log("GAME_UPDATE:", data);
+            render(data);
+        });
+
+        eventSource.onopen = function() {
+            console.log("SSE 연결 성공");
+            reconnectAttempts = 0;
+        };
+
+        eventSource.onerror = function() {
+            console.warn("SSE 연결 오류 발생");
+            
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+
+            // 재연결 시도
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`재연결 시도 ${reconnectAttempts}/${maxReconnectAttempts} - ${reconnectDelay}ms 후 재시도`);
+                
+                setTimeout(() => {
+                    connect();
+                }, reconnectDelay);
+            } else {
+                console.error("최대 재연결 시도 횟수 초과. 수동 새로고침이 필요합니다.");
+                document.getElementById("status").innerText = "연결 실패 - 페이지를 새로고침해주세요";
+            }
+        };
+    }
 
     function render(data) {
         document.getElementById("teamA").innerText = data.hostClubName;
@@ -52,10 +97,15 @@
         document.getElementById("startTime").innerText = data.startTime ?? "-";
     }
 
-    eventSource.onerror = () => {
-        console.warn("SSE 연결 종료");
-        eventSource.close();
-    };
+    // 페이지 언로드 시 연결 정리
+    window.addEventListener('beforeunload', function() {
+        if (eventSource) {
+            eventSource.close();
+        }
+    });
+
+    // 초기 연결
+    connect();
 </script>
 </body>
 </html>
