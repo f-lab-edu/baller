@@ -30,7 +30,8 @@ public class SecurityConfig {
 
     private static final String[] WHITE_LIST_POST_URL = {
             "/api/members",
-            "/api/members/login"
+            "/api/members/login",
+            "/api/auth/refresh"
     };
 
     private static final String[] WHITE_LIST_GET_URL = {

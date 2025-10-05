@@ -1,5 +1,6 @@
 package com.baller.security.filter;
 
+import com.baller.security.service.TokenService;
 import com.baller.security.util.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(
@@ -41,16 +43,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-               UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                // Blacklist 체크
+                if(tokenService.isTokenBlacklisted(token)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
-               if(jwtTokenProvider.isTokenValid(token, userDetails)) {
-                   UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                           userDetails, null, userDetails.getAuthorities()
-                   );
-                   authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // Access Token만 인증 처리 (Refresh Token은 별도 엔드포인트에서 처리)
+                if(jwtTokenProvider.isAccessToken(token)) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                   SecurityContextHolder.getContext().setAuthentication(authentication);
-               }
+                    if(jwtTokenProvider.isTokenValid(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities()
+                        );
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
 
             }
 

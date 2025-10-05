@@ -20,8 +20,10 @@ public class JwtTokenProvider {
 
     @Value("${application.security.jwt.secret-key}")
     private String SECRET_KEY;
-    @Value("${application.security.jwt.expiration}")
-    private long JWT_EXPIRATION;
+    @Value("${application.security.jwt.access-token-expiration}")
+    private long ACCESS_TOKEN_EXPIRATION;
+    @Value("${application.security.jwt.refresh-token-expiration}")
+    private long REFRESH_TOKEN_EXPIRATION;
 
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
@@ -29,7 +31,15 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, JWT_EXPIRATION);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "ACCESS");
+        return buildToken(claims, userDetails, ACCESS_TOKEN_EXPIRATION);
+    }
+    
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "REFRESH");
+        return buildToken(claims, userDetails, REFRESH_TOKEN_EXPIRATION);
     }
 
     public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
@@ -67,6 +77,42 @@ public class JwtTokenProvider {
 
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+    
+    /**
+     * 토큰 타입 추출 (ACCESS 또는 REFRESH)
+     */
+    public String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get("tokenType", String.class));
+    }
+    
+    /**
+     * Access Token인지 확인
+     */
+    public boolean isAccessToken(String token) {
+        return "ACCESS".equals(extractTokenType(token));
+    }
+    
+    /**
+     * Refresh Token인지 확인
+     */
+    public boolean isRefreshToken(String token) {
+        return "REFRESH".equals(extractTokenType(token));
+    }
+    
+    /**
+     * 토큰 만료 시간 추출 (초 단위)
+     */
+    public long getTokenExpiration(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return (expiration.getTime() - System.currentTimeMillis()) / 1000;
+    }
+    
+    /**
+     * Refresh Token 유효성 검증
+     */
+    public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
+        return isRefreshToken(token) && isTokenValid(token, userDetails);
     }
 
 }

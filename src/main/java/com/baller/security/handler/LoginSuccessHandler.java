@@ -2,6 +2,7 @@ package com.baller.security.handler;
 
 import com.baller.presentation.dto.response.member.LoginResponse;
 import com.baller.security.domain.CustomUserDetails;
+import com.baller.security.service.TokenService;
 import com.baller.security.util.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -33,12 +35,19 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
+        // Access Token과 Refresh Token 생성
         String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
+
+        // Refresh Token을 Redis에 저장 (7일)
+        long refreshTokenExpiration = jwtTokenProvider.getTokenExpiration(refreshToken);
+        tokenService.saveRefreshToken(userDetails.getUsername(), refreshToken, refreshTokenExpiration);
 
         log.info("Login successful : {}", userDetails.getUsername());
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
 
         response.setContentType(APPLICATION_JSON_VALUE);
